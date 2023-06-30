@@ -313,5 +313,11 @@ async def sparkle(ctx, message : str) :
 
     await ctx.response.send_message(output_message)
 
+@client.tree.command(name="say")
+@app_commands.describe(message = "Message to say as Luna Bot")
+async def say(ctx, message : str) :
+    await ctx.response.send_message("Sending the message now ^_^",ephemeral=True)
+    await ctx.channel.send(message)
+
     
 client.run(TOKEN)
