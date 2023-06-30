@@ -1,0 +1,8 @@
+<token>
+XXX.XXX
+
+<enable_interactions>
+[True/False]
+
+<enable_slash_commands>
+[True/False]
