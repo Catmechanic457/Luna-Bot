@@ -2,30 +2,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from responses import Responses
+from storage import Storage
+
 import time
 from random import *
-
-class Storage :
-    def __init__(self, primary_directory = "data/", settings_file = "settings.txt", config_file = "config.txt") :
-        self.directory_lookup = {
-            "primary_directory" : primary_directory,
-            "settings_file" : settings_file,
-            "config_file" : config_file
-        }
-    
-    def get(self, item_id : str) :
-        return self.directory_lookup[item_id]
-    
-    def find_content(self, file_location, header : str) :
-        file = open(file_location, "r")
-        all_content = file.readlines()
-        file.close()
-        found_header = False
-        for item in all_content :
-            if not found_header :
-                if item.replace("\n", "") == "<{}>".format(header) :
-                    found_header = True
-            else : return item.replace("\n", "")
     
 storage = Storage()
 
@@ -40,88 +21,17 @@ enable_slash_commands = storage.find_content(config_file_location, "enable_slash
 
 
 class Interaction :
-    def __init__(self, function : str, description : str = "No Description") :
-        self.function = function
+    def __init__(self, response_function : str, description : str = "No Description") :
+        self.function = response_function
         self.description = description
     
     def get_reply_content(self) : return self.function()
     def get_description(self) : return self.description
         
 
-class LunaBot(commands.Bot) :
+class LunaBot(commands.Bot, Responses) :
     last_wished_date = None
-    def caught_attention(self) -> str :
-        response_pool = [
-            "Huh? What?",
-            "You Called?",
-            "You Needed Me?",
-            "What? Where?",
-            "What is it?",
-            "I SWEAR I JUST HEARD MY NAME",
-            "WHO SAID THAT?"
-        ]
-        return choice(response_pool)
     
-    def demon_spotted(self) -> str :
-        response_pool = [
-            "Stay back, Demon!",
-            "That's the laugh of the devil...",
-            "Ahhh! Demon!",
-            "Get away ya Demon!",
-            "nonono You Get back, Demon!",
-            "Why does that laugh sound so demonic?",
-            "\*hisses\*"
-        ]
-        return choice(response_pool)
-    
-    def shiny_spotted(self) -> str :
-        response_pool = [
-            "Omgo it's sparkly!",
-            "^_^ Sparkly",
-            "Ohh it shiny",
-            ":sparkles:",
-            ":sparkles: :sparkles:",
-            ":sparkles: :sparkles: :sparkles:"
-        ]
-        return choice(response_pool)
-    
-    def reaction(self) -> str :
-        response_pool = [
-            "OMGO",
-            "omgo",
-            "lovley",
-            "woozy",
-            ":sparkles: wozzy :sparkles:",
-            ":sparkles: lovely :sparkles:",
-            "^_^",
-            ":sparkles:",
-            ":sparkles: :sparkles:",
-            ":sparkles: :sparkles: :sparkles:"
-        ]
-        return choice(response_pool)
-    
-    def emoticon_reaction(self) -> str :
-        response_pool = [
-            "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",
-            "^_^",
-            "=^..^=",
-            "~(^._.)",
-            "(っ◕‿◕)っ",
-            "=^..^= ~(^._.) (っ◕‿◕)っ"
-        ]
-        return choice(response_pool)
-        
-    
-    def grant_sleep(self) -> str :
-        response_pool = [
-            "Night",
-            "Night Night",
-            "Noight",
-            "Noight Noight",
-            "Ima go slep too",
-            "Yes... Sleep, Child"
-        ]
-        return choice(response_pool)
     
     def interaction_key(self) :
 
@@ -204,7 +114,7 @@ class LunaBot(commands.Bot) :
         return substitution_table
     
     def cleanse_input(self, message) :
-        message = message.strip()
+        message = message.replace(" ", "")
         message = message.lower()
 
         substitutions = self.substitutions()
@@ -236,6 +146,7 @@ async def on_ready():
         print("Synced {} command(s)".format(str(len(synced))))
     except Exception as e :
         print(e)
+        
     
 @client.event
 async def on_message(message):
@@ -243,12 +154,15 @@ async def on_message(message):
     if message.author == client.user : return # Do nothing if the message author is ourselves
 
     channel = message.channel # Get the channel of the message
-    print("Received :", message.content)
+
+    filtered_input = client.cleanse_input(message.content) # Remove spaces and capitals; Preform substitutions
+
+    print("Received : {} --> {}".format(message.content, filtered_input))
 
     # Interactions
     if enable_interactions :
         # Intercepts any non-command msgs
-        intercept = client.intercept(client.cleanse_input(message.content))
+        intercept = client.intercept(filtered_input)
         if intercept :
             await channel.send(intercept)
     
@@ -262,7 +176,10 @@ async def on_message(message):
     
     if enable_slash_commands : await client.process_commands(message) # Process commands after any messages
 
+
+
 # Slash Commands
+
 
 @client.tree.command(name="hello")
 async def hello(ctx):
@@ -281,6 +198,7 @@ async def interactions(ctx) :
 
     await ctx.response.send_message(table)
 
+
 @client.tree.command(name="substitutions")
 async def substitutions(ctx) :
     # Turn the interactions dictionary into a ascii table and send to the channel
@@ -293,10 +211,12 @@ async def substitutions(ctx) :
 
     await ctx.response.send_message(table)
 
+
 @client.tree.command(name="sparkle")
 @app_commands.describe(message = "Message to sparkle")
 async def sparkle(ctx, message : str) :
     await ctx.response.send_message(":sparkles: {} :sparkles:".format(message))
+
 
 @client.tree.command(name="make_quirky")
 @app_commands.describe(message = "Message to make quirky")
@@ -313,12 +233,10 @@ async def sparkle(ctx, message : str) :
 
     await ctx.response.send_message(output_message)
 
+
 @client.tree.command(name="say")
 @app_commands.describe(message = "Message to say as Luna Bot")
 async def say(ctx, message : str) :
-    #await ctx.response.send_message("Sending the message now ^_^",ephemeral=True)
-    #await ctx.channel.send(message)
-
     await ctx.response.send_message(message)
 
     
