@@ -1,2 +1,4 @@
 /data/config.txt
 /__pycache__
+/data/custom_interactions/server
+/data/custom_interactions/user

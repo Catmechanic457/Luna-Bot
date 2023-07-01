@@ -5,6 +5,7 @@ from discord.ext import commands
 from responses import Responses
 from storage import Storage
 
+import os
 import time
 from random import *
     
@@ -125,6 +126,20 @@ class LunaBot(commands.Bot, Responses) :
                 break
         
         return message
+    
+    def custom_interaction(self, message, user_id, server_id) :
+        user_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+        server_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+        file_name = None
+        if os.path.isfile(user_file_name) :
+            user_response = storage.find_content(user_file_name, message)
+            if user_response : return choice(user_response.split("|")).strip()
+
+        if os.path.isfile(server_file_name) :
+            server_response = storage.find_content(server_file_name, message)
+            if server_response : return choice(server_response.split("|")).strip()
+        
+        return None
 
 
 intents = discord.Intents.default()
@@ -171,6 +186,13 @@ async def on_message(message):
         unprompted_message = client.unprompted_message()
         if not unprompted_message == None :
             await channel.send(unprompted_message)
+    
+    # Custom interactions
+    if True :
+        custom_interaction = client.custom_interaction(filtered_input, message.author.id, message.guild.id)
+        if custom_interaction :
+            await channel.send(custom_interaction)
+
 
 
     
@@ -180,11 +202,7 @@ async def on_message(message):
 
 # Slash Commands
 
-
-@client.tree.command(name="hello")
-async def hello(ctx):
-    await ctx.response.send_message(f'Meow. I\'m here {ctx.user.mention}')
-
+# Info Commands
 
 @client.tree.command(name="interactions")
 async def interactions(ctx) :
@@ -211,6 +229,44 @@ async def substitutions(ctx) :
 
     await ctx.response.send_message(table)
 
+@client.tree.command(name="custom_interactions")
+@app_commands.describe(type = "[user/server]")
+async def custom_interactions(ctx, type : str) :
+    type = type.lower()
+    server_id = str(ctx.guild.id)
+    user_id = str(ctx.user.id)
+    storage_file_name = None
+    # Turn the custom interactions text file into a ascii table and send to the channel
+
+    if type == "server" :
+        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+    elif type == "user" :
+        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+
+    if not os.path.isfile(storage_file_name) :
+        await ctx.response.send_message("{} does not have any custom interactions :(".format(type))
+        return
+
+
+    file = open(storage_file_name, "r", encoding="utf-8")
+    raw = file.readlines()
+    file.close()
+
+    table = "**List of {} interactions :**`\n┌──────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────┐\n├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n".format(type)
+    for i in range(len(raw)//2) :
+        trigger = client.filter_emoji(raw[2*i].replace("\n", "")[1:-1])
+        response = client.filter_emoji(raw[2*i+1].replace("\n", ""))
+        table += "│{:30s}│{:90s}│\n".format(" \'{}\'".format(trigger), " {}".format(response))
+        table += "├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n"
+    table += "└──────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────┘`"
+
+    await ctx.response.send_message(table)
+
+# Say Commands
+
+@client.tree.command(name="hello")
+async def hello(ctx):
+    await ctx.response.send_message(f'Meow. I\'m here {ctx.user.mention}')
 
 @client.tree.command(name="sparkle")
 @app_commands.describe(message = "Message to sparkle")
@@ -239,5 +295,85 @@ async def sparkle(ctx, message : str) :
 async def say(ctx, message : str) :
     await ctx.response.send_message(message)
 
+# Utility Commands
+
+@client.tree.command(name="add_interaction")
+@app_commands.describe(type = "[user/server]", trigger = "The phrase Luna looks for", response = "Luna's response")
+async def add_interaction(ctx, type : str, trigger : str, response : str) :
+    type = type.lower()
+    trigger = client.cleanse_input(trigger)
+    server_id = str(ctx.guild.id)
+    user_id = str(ctx.user.id)
+    storage_file_name = None
+    if type == "server" :
+        if ctx.user.guild_permissions.administrator :
+            storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+        else :
+            await ctx.response.send_message("You must be an Admin to make server-wide interactions")
+
+    elif type == "user" :
+        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+        
+    else : 
+        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]")
+        return
+    
+    file = open(storage_file_name, "a", encoding="utf-8")
+    
+    try :
+        file.writelines("<{}>\n{}\n".format(trigger,response))
+
+    except :
+        await ctx.response.send_message("Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)")
+        file.close()
+        return
+    
+
+    await ctx.response.send_message("Added {} interaction:\n **{}** --> **{}**".format(type, trigger, response))
+
+@client.tree.command(name="delete_interaction")
+@app_commands.describe(type = "[user/server]", trigger = "The phrase to delete")
+async def delete_interaction(ctx, type : str, trigger : str) :
+    type = type.lower()
+    trigger = client.cleanse_input(trigger)
+    server_id = str(ctx.guild.id)
+    user_id = str(ctx.user.id)
+    storage_file_name = None
+    if type == "server" :
+        if ctx.user.guild_permissions.administrator :
+            storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+        else :
+            await ctx.response.send_message("You must be an Admin to delete server-wide interactions")
+
+    elif type == "user" :
+        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+        
+    else : 
+        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]")
+        return
+    
+    file = open(storage_file_name, "r", encoding="utf-8")
+    raw = file.readlines()
+    file.close()
+
+    file = open(storage_file_name, "w", encoding="utf-8")
+    exists = False
+    found = False
+    for line in raw :
+        if line.replace("\n", "") == "<{}>".format(trigger) :
+            exists = True
+            found = True
+
+        elif found :
+            found = False
+
+        else : file.writelines(line)
+
+    file.close()
+
+    if exists :
+        await ctx.response.send_message("Deleted {} interaction: **{}**".format(type, trigger))
+    else :
+        await ctx.response.send_message("{} interaction: **{}** does not exist.".format(type, trigger))
     
 client.run(TOKEN)
