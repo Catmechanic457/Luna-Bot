@@ -11,3 +11,6 @@ XXX.XXX
 Replacing "XXX.XXX" with the token of the bot
 
 Every configuration option can be found in config_examples.txt
+
+DIRECTORIES
+Directories in .gitignore must be added
