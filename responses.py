@@ -73,3 +73,15 @@ class Responses :
             "Yes... Sleep, Child"
         ]
         return choice(response_pool)
+    
+    def not_kitten(self) -> str :
+        response_pool = [
+            "I'm not a kitten I'm a cat",
+            "Don't call me a child!",
+            "I'm not that young...",
+            "Oh please im a CAT",
+            "I aint no CHILD",
+            "I'M NOT A KITTEN",
+            "I'M NOT A CHILDDD"
+        ]
+        return choice(response_pool)

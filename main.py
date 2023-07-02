@@ -43,6 +43,7 @@ class LunaBot(commands.Bot, Responses) :
         emoticon_reaction = Interaction(self.emoticon_reaction, "Luna reacts with a cute face")
         grant_sleep = Interaction(self.grant_sleep, "Luna wishes you a good night")
         shiny_spotted = Interaction(self.shiny_spotted, "Luna spots something shiny")
+        not_kitten = Interaction(self.not_kitten, "Luna claims she is not that young")
 
         intercept = {
                 "ps" : caught_attention,
@@ -58,6 +59,8 @@ class LunaBot(commands.Bot, Responses) :
                 "hehe" : devil_spotted,
 
                 "night" : grant_sleep,
+
+                "kitten" : not_kitten,
 
                 ":sparkles:" : shiny_spotted
         }
@@ -110,7 +113,11 @@ class LunaBot(commands.Bot, Responses) :
 
             "nightnight" : "night",
             "noight" : "night",
-            "noightnoight" : "night"
+            "noightnoight" : "night",
+
+            "kiten" : "kitten",
+            "kitty" : "kitten",
+            "kity" : "kitten"
         }
         return substitution_table
     
