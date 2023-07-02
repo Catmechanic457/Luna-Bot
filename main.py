@@ -179,25 +179,27 @@ async def on_message(message):
 
     filtered_input = client.cleanse_input(message.content) # Remove spaces and capitals; Preform substitutions
 
-    print("Received : {} --> {}".format(message.content, filtered_input))
-
     # Interactions
     if enable_interactions :
         # Intercepts any non-command msgs
         intercept = client.intercept(filtered_input)
         if intercept :
+            print("Received \'{}\'\tFiltered To \'{}\'\tReturning \'{}\'".format(message.content, filtered_input, intercept))
             await channel.send(intercept)
     
     # Unprompted messages
     if True :
         unprompted_message = client.unprompted_message()
         if not unprompted_message == None :
+            print("Sending Unprompted \'{}\'".format(unprompted_message))
             await channel.send(unprompted_message)
     
     # Custom interactions
     if True :
         custom_interaction = client.custom_interaction(filtered_input, message.author.id, message.guild.id)
         if custom_interaction :
+            print("Received \'{}\'\tFiltered To \'{}\'\tReturning \'{}\'".format(message.content, filtered_input, custom_interaction))
+            await channel.send(intercept)
             await channel.send(custom_interaction)
 
 
