@@ -221,7 +221,7 @@ async def interactions(ctx) :
         table += "├──────────────────────────────┼─────────────────────────────────────────────┤\n"
     table += "└──────────────────────────────┴─────────────────────────────────────────────┘`"
 
-    await ctx.response.send_message(table)
+    await ctx.response.send_message(table, ephemeral=True)
 
 
 @client.tree.command(name="substitutions")
@@ -234,7 +234,7 @@ async def substitutions(ctx) :
         table += "├─────────────────────────────────────────────┼───────────────┤\n"
     table += "└─────────────────────────────────────────────┴───────────────┘`"
 
-    await ctx.response.send_message(table)
+    await ctx.response.send_message(table, ephemeral=True)
 
 @client.tree.command(name="custom_interactions")
 @app_commands.describe(type = "[user/server]")
@@ -251,7 +251,7 @@ async def custom_interactions(ctx, type : str) :
         storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
 
     if not os.path.isfile(storage_file_name) :
-        await ctx.response.send_message("{} does not have any custom interactions :(".format(type))
+        await ctx.response.send_message("{} does not have any custom interactions :(".format(type), ephemeral=True)
         return
 
 
@@ -267,13 +267,13 @@ async def custom_interactions(ctx, type : str) :
         table += "├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n"
     table += "└──────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────┘`"
 
-    await ctx.response.send_message(table)
+    await ctx.response.send_message(table, ephemeral=True)
 
 # Say Commands
 
 @client.tree.command(name="hello")
 async def hello(ctx):
-    await ctx.response.send_message(f'Meow. I\'m here {ctx.user.mention}')
+    await ctx.response.send_message(f'Meow. I\'m here {ctx.user.mention}', ephemeral=True)
 
 @client.tree.command(name="sparkle")
 @app_commands.describe(message = "Message to sparkle")
@@ -316,13 +316,13 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
         if ctx.user.guild_permissions.administrator :
             storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
         else :
-            await ctx.response.send_message("You must be an Admin to make server-wide interactions")
+            await ctx.response.send_message("You must be an Admin to make server-wide interactions", ephemeral=True)
 
     elif type == "user" :
         storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
         
     else : 
-        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]")
+        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]" , ephemeral=True)
         return
     
     file = open(storage_file_name, "a", encoding="utf-8")
@@ -331,12 +331,12 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
         file.writelines("<{}>\n{}\n".format(trigger,response))
 
     except :
-        await ctx.response.send_message("Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)")
+        await ctx.response.send_message("Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)" , ephemeral=True)
         file.close()
         return
     
 
-    await ctx.response.send_message("Added {} interaction:\n **{}** --> **{}**".format(type, trigger, response))
+    await ctx.response.send_message("Added {} interaction:\n **{}** --> **{}**".format(type, trigger, response), ephemeral=(type=="user"))
 
 @client.tree.command(name="delete_interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase to delete")
@@ -350,13 +350,13 @@ async def delete_interaction(ctx, type : str, trigger : str) :
         if ctx.user.guild_permissions.administrator :
             storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
         else :
-            await ctx.response.send_message("You must be an Admin to delete server-wide interactions")
+            await ctx.response.send_message("You must be an Admin to delete server-wide interactions", ephemeral=True)
 
     elif type == "user" :
         storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
         
     else : 
-        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]")
+        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]", ephemeral=True)
         return
     
     file = open(storage_file_name, "r", encoding="utf-8")
@@ -379,8 +379,8 @@ async def delete_interaction(ctx, type : str, trigger : str) :
     file.close()
 
     if exists :
-        await ctx.response.send_message("Deleted {} interaction: **{}**".format(type, trigger))
+        await ctx.response.send_message("Deleted {} interaction: **{}**".format(type, trigger), ephemeral=(type=="user"))
     else :
-        await ctx.response.send_message("{} interaction: **{}** does not exist.".format(type, trigger))
+        await ctx.response.send_message("{} interaction: **{}** does not exist.".format(type, trigger), ephemeral=True)
     
 client.run(TOKEN)
