@@ -7,6 +7,7 @@ from storage import Storage
 
 import os
 import time
+from io import BytesIO
 from random import *
     
 storage = Storage()
@@ -199,7 +200,6 @@ async def on_message(message):
         custom_interaction = client.custom_interaction(filtered_input, message.author.id, message.guild.id)
         if custom_interaction :
             print("Received \'{}\'\tFiltered To \'{}\'\tReturning \'{}\'".format(message.content, filtered_input, custom_interaction))
-            await channel.send(intercept)
             await channel.send(custom_interaction)
 
 
@@ -217,26 +217,31 @@ async def on_message(message):
 async def interactions(ctx) :
     # Turn the interactions dictionary into a ascii table and send to the channel
     interaction_key = client.interaction_key()
-    table = "**List of interactions :**`\n┌──────────────────────────────┬─────────────────────────────────────────────┐\n├──────────────────────────────┼─────────────────────────────────────────────┤\n"
+    table = "`\n┌──────────────────────────────┬─────────────────────────────────────────────┐\n├──────────────────────────────┼─────────────────────────────────────────────┤\n"
     for key in interaction_key :
         table += "│{:30s}│{:45s}│\n".format(" \'{}\'".format(key), " {}".format(interaction_key[key].get_description()))
         table += "├──────────────────────────────┼─────────────────────────────────────────────┤\n"
     table += "└──────────────────────────────┴─────────────────────────────────────────────┘`"
 
-    await ctx.response.send_message(table, ephemeral=True)
-
+    try :
+        await ctx.response.send_message("**List of interactions :**{}".format(table), ephemeral=True)
+    except :
+        await ctx.response.send_message("**List of interactions :**", file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
 @client.tree.command(name="substitutions")
 async def substitutions(ctx) :
     # Turn the interactions dictionary into a ascii table and send to the channel
     substitution_key = client.substitutions()
-    table = "**List of substitutions :**\n(The following keywords are equivalent)`\n┌─────────────────────────────────────────────┬───────────────┐\n├─────────────────────────────────────────────┼───────────────┤\n"
+    table = "`\n┌─────────────────────────────────────────────┬───────────────┐\n├─────────────────────────────────────────────┼───────────────┤\n"
     for key in substitution_key :
         table += "│{:45s}│{:15s}│\n".format(" {}".format(client.filter_emoji(key)), " {}".format(substitution_key[key]))
         table += "├─────────────────────────────────────────────┼───────────────┤\n"
     table += "└─────────────────────────────────────────────┴───────────────┘`"
 
-    await ctx.response.send_message(table, ephemeral=True)
+    try :
+        await ctx.response.send_message("**List of substitutions :**\n(The following keywords are equivalent){}".format(table), ephemeral=True)
+    except :
+        await ctx.response.send_message("**List of substitutions :**\n(The following keywords are equivalent)", file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
 @client.tree.command(name="custom_interactions")
 @app_commands.describe(type = "[user/server]")
@@ -261,7 +266,7 @@ async def custom_interactions(ctx, type : str) :
     raw = file.readlines()
     file.close()
 
-    table = "**List of {} interactions :**`\n┌──────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────┐\n├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n".format(type)
+    table = "`\n┌──────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────┐\n├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n"
     for i in range(len(raw)//2) :
         trigger = client.filter_emoji(raw[2*i].replace("\n", "")[1:-1])
         response = client.filter_emoji(raw[2*i+1].replace("\n", ""))
@@ -269,7 +274,10 @@ async def custom_interactions(ctx, type : str) :
         table += "├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n"
     table += "└──────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────┘`"
 
-    await ctx.response.send_message(table, ephemeral=True)
+    try :
+        await ctx.response.send_message("**List of {} interactions :**{}".format(type, table), ephemeral=True)
+    except :
+        await ctx.response.send_message("**List of {} interactions :**".format(type), file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
 # Say Commands
 
