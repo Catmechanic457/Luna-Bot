@@ -34,6 +34,9 @@ class Responses :
             ":sparkles: :sparkles:",
             ":sparkles: :sparkles: :sparkles:"
         ]
+        if randint(0,1) == 0 :
+            return "{} {}".format(choice(response_pool), self.emoticon_reaction())
+        
         return choice(response_pool)
     
     def reaction(self) -> str :
@@ -44,15 +47,18 @@ class Responses :
             "woozy",
             ":sparkles: wozzy :sparkles:",
             ":sparkles: lovely :sparkles:",
-            "^_^",
             ":sparkles:",
             ":sparkles: :sparkles:",
             ":sparkles: :sparkles: :sparkles:"
         ]
+        if randint(0,1) == 0 :
+            return "{} {}".format(choice(response_pool), self.emoticon_reaction())
+        
         return choice(response_pool)
     
     def emoticon_reaction(self) -> str :
         response_pool = [
+            "ฅ⁠^⁠•⁠ﻌ⁠•⁠^⁠ฅ",
             "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",
             "^_^",
             "=^..^=",
@@ -72,6 +78,9 @@ class Responses :
             "Ima go slep too",
             "Yes... Sleep, Child"
         ]
+        if randint(0,1) == 0 :
+            return "{} {}".format(choice(response_pool), self.emoticon_reaction())
+        
         return choice(response_pool)
     
     def not_kitten(self) -> str :
