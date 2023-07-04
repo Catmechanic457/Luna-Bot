@@ -213,7 +213,7 @@ async def on_message(message):
 
 # Info Commands
 
-@client.tree.command(name="interactions")
+@client.tree.command(name="interactions", description="Lists all default interactions")
 async def interactions(ctx) :
     # Turn the interactions dictionary into a ascii table and send to the channel
     interaction_key = client.interaction_key()
@@ -228,7 +228,7 @@ async def interactions(ctx) :
     except :
         await ctx.response.send_message("**List of interactions :**", file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
-@client.tree.command(name="substitutions")
+@client.tree.command(name="substitutions", description="Lists all default substitutions")
 async def substitutions(ctx) :
     # Turn the interactions dictionary into a ascii table and send to the channel
     substitution_key = client.substitutions()
@@ -243,7 +243,7 @@ async def substitutions(ctx) :
     except :
         await ctx.response.send_message("**List of substitutions :**\n(The following keywords are equivalent)", file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
-@client.tree.command(name="custom_interactions")
+@client.tree.command(name="custom_interactions", description="Lists all custom server or user interactions")
 @app_commands.describe(type = "[user/server]")
 async def custom_interactions(ctx, type : str) :
     type = type.lower()
@@ -281,17 +281,17 @@ async def custom_interactions(ctx, type : str) :
 
 # Say Commands
 
-@client.tree.command(name="hello")
+@client.tree.command(name="hello", description = "Checks Luna is alive and kicking")
 async def hello(ctx):
     await ctx.response.send_message(f'Meow. I\'m here {ctx.user.mention}', ephemeral=True)
 
-@client.tree.command(name="sparkle")
+@client.tree.command(name="sparkle", description="Adds sparkles (✨) around a message")
 @app_commands.describe(message = "Message to sparkle")
 async def sparkle(ctx, message : str) :
     await ctx.response.send_message(":sparkles: {} :sparkles:".format(message))
 
 
-@client.tree.command(name="make_quirky")
+@client.tree.command(name="make_quirky", description="Types a message out in aLtErNaTiNg CaPs")
 @app_commands.describe(message = "Message to make quirky")
 async def sparkle(ctx, message : str) :
     output_message = ""
@@ -307,14 +307,14 @@ async def sparkle(ctx, message : str) :
     await ctx.response.send_message(output_message)
 
 
-@client.tree.command(name="say")
+@client.tree.command(name="say", description = "Sends a message as Luna")
 @app_commands.describe(message = "Message to say as Luna Bot")
 async def say(ctx, message : str) :
     await ctx.response.send_message(message)
 
 # Utility Commands
 
-@client.tree.command(name="add_interaction")
+@client.tree.command(name="add_interaction", description="Adds a custom server or user interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase Luna looks for", response = "Luna's response")
 async def add_interaction(ctx, type : str, trigger : str, response : str) :
     type = type.lower()
@@ -348,7 +348,7 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
 
     await ctx.response.send_message("Added {} interaction:\n **{}** --> **{}**".format(type, trigger, response), ephemeral=(type=="user"))
 
-@client.tree.command(name="delete_interaction")
+@client.tree.command(name="delete_interaction", description="Deletes a custom server or user interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase to delete")
 async def delete_interaction(ctx, type : str, trigger : str) :
     type = type.lower()
