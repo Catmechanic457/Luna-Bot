@@ -94,3 +94,24 @@ class Responses :
             "I'M NOT A CHILDDD"
         ]
         return choice(response_pool)
+    
+    def meow(self) -> str :
+        response_pool = [
+            "Meow?",
+            "Meow",
+            "Mau",
+            "Meeoowww",
+            "Mewww",
+            "Maouu",
+            "MMeeow",
+            "M E O W",
+            "m e o w",
+            "moo",
+            "\*purrs\*"
+            "\*happy cat noises\*"
+        ]
+
+        if randint(0,1) == 0 :
+            return "{} {}".format(choice(response_pool), self.emoticon_reaction())
+        
+        return choice(response_pool)
