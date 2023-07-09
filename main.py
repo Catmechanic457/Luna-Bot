@@ -157,6 +157,12 @@ class LunaBot(commands.Bot, Responses) :
             if server_response : return choice(server_response.split("|")).strip()
         
         return None
+    
+    def get_guild_id(self, message_object) -> str | None :
+        try :
+            return message_object.guild.id
+        except :
+            return None
 
 
 intents = discord.Intents.default()
@@ -206,7 +212,7 @@ async def on_message(message):
     
     # Custom interactions
     if True :
-        custom_interaction = client.custom_interaction(filtered_input, message.author.id, message.guild.id)
+        custom_interaction = client.custom_interaction(filtered_input, message.author.id, client.get_guild_id(message))
         if custom_interaction :
             print("Received \'{}\'\tFiltered To \'{}\'\tReturning \'{}\'".format(message.content, filtered_input, custom_interaction))
             await channel.send(custom_interaction)
@@ -256,15 +262,21 @@ async def substitutions(ctx) :
 @app_commands.describe(type = "[user/server]")
 async def custom_interactions(ctx, type : str) :
     type = type.lower()
-    server_id = str(ctx.guild.id)
+    server_id = str(client.get_guild_id(ctx))
     user_id = str(ctx.user.id)
     storage_file_name = None
+
     # Turn the custom interactions text file into a ascii table and send to the channel
 
-    if type == "server" :
+    if type == "server" and not server_id == "None" :
         storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+
     elif type == "user" :
         storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+    
+    else : 
+        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]", ephemeral=True)
+        return
 
     if not os.path.isfile(storage_file_name) :
         await ctx.response.send_message("{} does not have any custom interactions :(".format(type), ephemeral=True)
@@ -328,10 +340,10 @@ async def say(ctx, message : str) :
 async def add_interaction(ctx, type : str, trigger : str, response : str) :
     type = type.lower()
     trigger = client.cleanse_input(trigger)
-    server_id = str(ctx.guild.id)
+    server_id = str(client.get_guild_id(ctx))
     user_id = str(ctx.user.id)
     storage_file_name = None
-    if type == "server" :
+    if type == "server" and not server_id == "None" :
         if ctx.user.guild_permissions.administrator :
             storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
         else :
@@ -362,10 +374,10 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
 async def delete_interaction(ctx, type : str, trigger : str) :
     type = type.lower()
     trigger = client.cleanse_input(trigger)
-    server_id = str(ctx.guild.id)
+    server_id = str(client.get_guild_id(ctx))
     user_id = str(ctx.user.id)
     storage_file_name = None
-    if type == "server" :
+    if type == "server" and not server_id == "None" :
         if ctx.user.guild_permissions.administrator :
             storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
         else :
