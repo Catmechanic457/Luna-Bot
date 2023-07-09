@@ -107,7 +107,7 @@ class Responses :
             "M E O W",
             "m e o w",
             "moo",
-            "\*purrs\*"
+            "\*purrs\*",
             "\*happy cat noises\*"
         ]
 
