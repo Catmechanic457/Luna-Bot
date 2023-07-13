@@ -4,11 +4,14 @@ from discord.ext import commands
 
 from responses import Responses
 from storage import *
+import actions
+import luna_assets
 
 import os
 import time
 from io import BytesIO
 from random import *
+import math
     
 storage = Storage()
 
@@ -34,7 +37,11 @@ class Interaction :
         
 
 class LunaBot(commands.Bot, Responses) :
+
     last_wished_date = None
+
+    daily_food_timestamp = {}
+    play_timestamp = {}
     
     
     def interaction_key(self) :
@@ -167,6 +174,49 @@ class LunaBot(commands.Bot, Responses) :
             return message_object.guild.id
         except :
             return None
+    
+    def edit_balance(self, user_id, amount) :
+        user_file_name = "{}{}{}.txt".format(storage.get("primary_directory"),storage.get("user_data_directory"), user_id)
+        user_file = Storage_File(user_file_name)
+        if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
+            balance = int(user_file.find_content("balance"))
+            balance += amount
+            if balance < 0 : balance = 0
+            user_file.edit_content("balance", str(balance))
+        else :
+            if amount < 0 : amount = 0
+            user_file.add_item("balance", str(amount))
+    
+    def get_balance(self, user_id) -> int :
+        user_file_name = "{}{}{}.txt".format(storage.get("primary_directory"),storage.get("user_data_directory"), user_id)
+        user_file = Storage_File(user_file_name)
+        if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
+            balance = int(user_file.find_content("balance"))
+            return balance
+        else :
+            return 0
+        
+    
+    async def enact(self, ctx, title, action : actions.Action, negative_chance) -> int :
+        description = action.get_description()
+        response = None
+        reward = None
+
+        positive = randint(1,negative_chance) != 1
+        if positive :
+            response = action.get_positive()
+            reward = action.get_positive_score()
+        else :
+            response = action.get_negative()
+            reward = action.get_negative_score()
+        
+        embed = discord.Embed(title=title, color=0x00ff55)
+        embed.add_field(name=description, value=response, inline=False)
+        embed.add_field(name="Result", value="{} {}".format(str(reward), luna_assets.coin_symbol))
+        
+        await ctx.response.send_message(embed=embed, ephemeral=True)
+
+        return reward
 
 
 intents = discord.Intents.default()
@@ -406,5 +456,52 @@ async def delete_interaction(ctx, type : str, trigger : str) :
         await ctx.response.send_message("Deleted {} interaction: **{}**".format(type, trigger), ephemeral=(type=="user"))
     else :
         await ctx.response.send_message("{} interaction: **{}** does not exist.".format(type, trigger), ephemeral=True)
-    
+
+# Economy Commands
+
+@client.tree.command(name="daily_food", description="Gives Luna her daily bowl of food. Hopefully she likes it")
+async def daily_food(ctx) :
+    user_id = str(ctx.user.id)
+    day = time.localtime().tm_yday
+    if user_id in client.daily_food_timestamp and client.daily_food_timestamp[user_id] == day :
+        embed = discord.Embed(title="Luna's already been fed", description="Wait until tomorrow to feed Luna again", color=0xff0000)
+        await ctx.response.send_message(embed=embed, ephemeral=True)
+    else :
+        client.daily_food_timestamp[user_id] = day
+        reward = await client.enact(ctx, "Feed Luna", actions.give_food, 4)
+        client.edit_balance(user_id, reward)
+
+
+@client.tree.command(name="play", description="Play with luna to increase or decrease your Purr Points")
+async def play(ctx) :
+    user_id = str(ctx.user.id)
+    epoch = time.time()
+    break_min = 15
+    if user_id in client.play_timestamp :
+        target_epoch = client.play_timestamp[user_id] + (break_min * 60)
+        if epoch < target_epoch :
+            embed = discord.Embed(title="Luna's tired", description="Luna needs a break from playing", color=0xff0000)
+            embed.add_field(name="Come Back In", value="{} minute(s)".format(str(math.ceil((client.play_timestamp[user_id] + (break_min * 60) - epoch)/60))))
+            await ctx.response.send_message(embed=embed, ephemeral=True)
+            return
+        
+    client.play_timestamp[user_id] = epoch
+    action_pool = [actions.pet, actions.tease, actions.balloon]
+    reward = await client.enact(ctx, "Play with Luna", choice(action_pool), 2)
+    client.edit_balance(user_id, reward)
+
+@client.tree.command(name="balance", description="Tells you how many Purr Points is in your wallet")
+@app_commands.describe(user = "user")
+async def balance(ctx, user : discord.User = None) :
+    if user == None :
+        user_id = str(ctx.user.id)
+        user = ctx.user
+    else :
+        user_id = user.id
+
+    balance = client.get_balance(user_id)
+    embed = discord.Embed(title="{}'s Wallet".format(user.name), description="Wallet Details", color=0x00ff55)
+    embed.add_field(name="Balance", value="{} {}".format(str(balance), luna_assets.coin_symbol), inline=False)
+    await ctx.response.send_message(embed=embed, ephemeral=True)
+
 client.run(TOKEN)

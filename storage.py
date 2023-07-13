@@ -4,6 +4,7 @@ class Storage :
     primary_directory = "data/",
     settings_file = "settings.txt",
     config_file = "config.txt",
+    user_data_directory = "user_data/",
     custom_interactions_directory = "custom_interactions/",
     custom_interactions_user = "user/",
     custom_interactions_server = "server/") :
@@ -12,6 +13,7 @@ class Storage :
             "primary_directory" : primary_directory,
             "settings_file" : settings_file,
             "config_file" : config_file,
+            "user_data_directory" : user_data_directory,
             "custom_interactions_directory" : custom_interactions_directory,
             "custom_interactions_user" : custom_interactions_user,
             "custom_interactions_server" : custom_interactions_server
