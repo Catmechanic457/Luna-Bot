@@ -17,16 +17,81 @@ class Storage :
             "custom_interactions_server" : custom_interactions_server
         }
     
-    def get(self, item_id : str) :
+    def get(self, item_id : str) -> str :
         return self.directory_lookup[item_id]
     
-    def find_content(self, file_location, header : str) :
-        file = open(file_location, "r", encoding="utf-8")
-        all_content = file.readlines()
+class Storage_File :
+
+    def __init__(self, file_location) -> None :
+        self.file_location = file_location
+
+        
+    def header_exists(self, header : str) -> bool :
+        file = open(self.file_location, "r", encoding="utf-8")
+        raw = file.readlines()
+        file.close()
+
+        for item in raw :
+            if item.replace("\n", "") == "<{}>".format(header) :
+                return True
+        
+        return False
+    
+    def find_content(self, header : str) -> str | None :
+        file = open(self.file_location, "r", encoding="utf-8")
+        raw = file.readlines()
         file.close()
         found_header = False
-        for item in all_content :
+        for item in raw :
             if not found_header :
                 if item.replace("\n", "") == "<{}>".format(header) :
                     found_header = True
             else : return item.replace("\n", "")
+        return None
+    
+    def add_item(self, header : str, content : str) -> None :
+        file = open(self.file_location, "a", encoding="utf-8")
+        file.writelines("<{}>\n{}\n".format(header, content))
+        file.close()
+    
+    def edit_content(self, header : str, content : str) -> None :
+        if not self.header_exists(header) :
+            return
+        file = open(self.file_location, "r", encoding="utf-8")
+        raw = file.readlines()
+        file.close()
+
+        file = open(self.file_location, "w", encoding="utf-8")
+        found = False
+        for line in raw :
+            if not found :
+                file.writelines(line)
+                if line.replace("\n", "") == "<{}>".format(header) :
+                    found = True
+
+            else :
+                found = False
+                file.writelines("{}\n".format(content))
+                
+
+        file.close()
+    
+    def delete_item(self, header : str) -> None :
+        file = open(self.file_location, "r", encoding="utf-8")
+        raw = file.readlines()
+        file.close()
+
+        file = open(self.file_location, "w", encoding="utf-8")
+        found = False
+        for line in raw :
+            if line.replace("\n", "") == "<{}>".format(header) :
+                # Don't re-write header
+                found = True
+
+            elif found :
+                # Don't re-write content
+                found = False
+
+            else : file.writelines(line) # Re-write everything else
+
+        file.close()

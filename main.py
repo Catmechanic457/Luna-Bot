@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from responses import Responses
-from storage import Storage
+from storage import *
 
 import os
 import time
@@ -16,10 +16,12 @@ storage = Storage()
 
 config_file_location = "{}{}".format(storage.get("primary_directory"), storage.get("config_file"))
 
-TOKEN = storage.find_content(config_file_location, "token")
+config_file = Storage_File(config_file_location)
 
-enable_interactions = storage.find_content(config_file_location, "enable_interactions") == "True"
-enable_slash_commands = storage.find_content(config_file_location, "enable_slash_commands") == "True"
+TOKEN = config_file.find_content("token")
+
+enable_interactions = config_file.find_content("enable_interactions") == "True"
+enable_slash_commands = config_file.find_content("enable_slash_commands") == "True"
 
 
 class Interaction :
@@ -149,11 +151,13 @@ class LunaBot(commands.Bot, Responses) :
         server_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
         file_name = None
         if os.path.isfile(user_file_name) :
-            user_response = storage.find_content(user_file_name, message)
+            user_file = Storage_File(user_file_name)
+            user_response = user_file.find_content(message)
             if user_response : return choice(user_response.split("|")).strip()
 
         if os.path.isfile(server_file_name) :
-            server_response = storage.find_content(server_file_name, message)
+            server_file = Storage_File(server_file_name)
+            server_response = server_file.find_content(message)
             if server_response : return choice(server_response.split("|")).strip()
         
         return None
@@ -356,15 +360,20 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
         await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]" , ephemeral=True)
         return
     
-    file = open(storage_file_name, "a", encoding="utf-8")
+    storage_file = Storage_File(storage_file_name)
     
-    try :
-        file.writelines("<{}>\n{}\n".format(trigger,response))
+    if storage_file.header_exists(trigger) :
+        existing_response = storage_file.find_content(trigger)
+        storage_file.edit_content(trigger, "{} | {}".format(existing_response, response))
+    
+    else :
+    
+        try :
+            storage_file.add_item(trigger, response)
 
-    except :
-        await ctx.response.send_message("Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)" , ephemeral=True)
-        file.close()
-        return
+        except :
+            await ctx.response.send_message("Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)" , ephemeral=True)
+            return
     
 
     await ctx.response.send_message("Added {} interaction:\n **{}** --> **{}**".format(type, trigger, response), ephemeral=(type=="user"))
@@ -390,26 +399,10 @@ async def delete_interaction(ctx, type : str, trigger : str) :
         await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]", ephemeral=True)
         return
     
-    file = open(storage_file_name, "r", encoding="utf-8")
-    raw = file.readlines()
-    file.close()
+    storage_file = Storage_File(storage_file_name)
 
-    file = open(storage_file_name, "w", encoding="utf-8")
-    exists = False
-    found = False
-    for line in raw :
-        if line.replace("\n", "") == "<{}>".format(trigger) :
-            exists = True
-            found = True
-
-        elif found :
-            found = False
-
-        else : file.writelines(line)
-
-    file.close()
-
-    if exists :
+    if storage_file.header_exists(trigger) :
+        storage_file.delete_item(trigger)
         await ctx.response.send_message("Deleted {} interaction: **{}**".format(type, trigger), ephemeral=(type=="user"))
     else :
         await ctx.response.send_message("{} interaction: **{}** does not exist.".format(type, trigger), ephemeral=True)
