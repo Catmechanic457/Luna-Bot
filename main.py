@@ -12,12 +12,13 @@ import time
 from io import BytesIO
 from random import *
 import math
+import embeds
     
 storage = Storage()
 
 # Configure
 
-config_file_location = "{}{}".format(storage.get("primary_directory"), storage.get("config_file"))
+config_file_location = f'{storage.get("primary_directory")}{storage.get("config_file")}'
 
 config_file = Storage_File(config_file_location)
 
@@ -39,7 +40,6 @@ class Interaction :
 class LunaBot(commands.Bot, Responses) :
 
     last_wished_date = None
-
     daily_food_timestamp = {}
     play_timestamp = {}
     
@@ -154,8 +154,8 @@ class LunaBot(commands.Bot, Responses) :
         return message
     
     def custom_interaction(self, message, user_id, server_id) :
-        user_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
-        server_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+        user_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}{user_id}.txt'
+        server_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_server")}{server_id}.txt'
         file_name = None
         if os.path.isfile(user_file_name) :
             user_file = Storage_File(user_file_name)
@@ -176,7 +176,7 @@ class LunaBot(commands.Bot, Responses) :
             return None
     
     def edit_balance(self, user_id, amount) :
-        user_file_name = "{}{}{}.txt".format(storage.get("primary_directory"),storage.get("user_data_directory"), user_id)
+        user_file_name = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{user_id}.txt'
         user_file = Storage_File(user_file_name)
         if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
             balance = int(user_file.find_content("balance"))
@@ -188,7 +188,7 @@ class LunaBot(commands.Bot, Responses) :
             user_file.add_item("balance", str(amount))
     
     def get_balance(self, user_id) -> int :
-        user_file_name = "{}{}{}.txt".format(storage.get("primary_directory"),storage.get("user_data_directory"), user_id)
+        user_file_name = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{user_id}.txt'
         user_file = Storage_File(user_file_name)
         if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
             balance = int(user_file.find_content("balance"))
@@ -210,9 +210,9 @@ class LunaBot(commands.Bot, Responses) :
             response = action.get_negative()
             reward = action.get_negative_score()
         
-        embed = discord.Embed(title=title, color=0x00ff55)
+        embed = discord.Embed(title=title, color=embeds.green)
         embed.add_field(name=description, value=response, inline=False)
-        embed.add_field(name="Result", value="{} {}".format(str(reward), luna_assets.coin_symbol))
+        embed.add_field(name="Result", value=f'{reward} {luna_assets.coin_symbol}')
         
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
@@ -235,7 +235,7 @@ async def on_ready():
     try :
         print("Syncing Commands...")
         synced = await client.tree.sync()
-        print("Synced {} command(s)".format(str(len(synced))))
+        print(f'Synced {len(synced)} command(s)')
     except Exception as e :
         print(e)
         
@@ -254,21 +254,21 @@ async def on_message(message):
         # Intercepts any non-command msgs
         intercept = client.intercept(filtered_input)
         if intercept :
-            print("Received \'{}\'\tFiltered To \'{}\'\tReturning \'{}\'".format(message.content, filtered_input, intercept))
+            print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{intercept}\'')
             await channel.send(intercept)
     
     # Unprompted messages
     if True :
         unprompted_message = client.unprompted_message()
         if not unprompted_message == None :
-            print("Sending Unprompted \'{}\'".format(unprompted_message))
+            print(f'Sending Unprompted \'{unprompted_message}\'')
             await channel.send(unprompted_message)
     
     # Custom interactions
     if True :
         custom_interaction = client.custom_interaction(filtered_input, message.author.id, client.get_guild_id(message))
         if custom_interaction :
-            print("Received \'{}\'\tFiltered To \'{}\'\tReturning \'{}\'".format(message.content, filtered_input, custom_interaction))
+            print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{custom_interaction}\'')
             await channel.send(custom_interaction)
 
 
@@ -288,7 +288,7 @@ async def interactions(ctx) :
     interaction_key = client.interaction_key()
     table = "`\n┌──────────────────────────────┬─────────────────────────────────────────────┐\n├──────────────────────────────┼─────────────────────────────────────────────┤\n"
     for key in interaction_key :
-        table += "│{:30s}│{:45s}│\n".format(" \'{}\'".format(key), " {}".format(interaction_key[key].get_description()))
+        table += "│{:30s}│{:45s}│\n".format(f' \'{key}\'', f' {interaction_key[key].get_description()}')
         table += "├──────────────────────────────┼─────────────────────────────────────────────┤\n"
     table += "└──────────────────────────────┴─────────────────────────────────────────────┘`"
 
@@ -303,12 +303,12 @@ async def substitutions(ctx) :
     substitution_key = client.substitutions()
     table = "`\n┌─────────────────────────────────────────────┬───────────────┐\n├─────────────────────────────────────────────┼───────────────┤\n"
     for key in substitution_key :
-        table += "│{:45s}│{:15s}│\n".format(" {}".format(client.filter_emoji(key)), " {}".format(substitution_key[key]))
+        table += "│{:45s}│{:15s}│\n".format(f' {client.filter_emoji(key)}', f' {substitution_key[key]}')
         table += "├─────────────────────────────────────────────┼───────────────┤\n"
     table += "└─────────────────────────────────────────────┴───────────────┘`"
 
     try :
-        await ctx.response.send_message("**List of substitutions :**\n(The following keywords are equivalent){}".format(table), ephemeral=True)
+        await ctx.response.send_message(f'**List of substitutions :**\n(The following keywords are equivalent){table}', ephemeral=True)
     except :
         await ctx.response.send_message("**List of substitutions :**\n(The following keywords are equivalent)", file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
@@ -323,17 +323,17 @@ async def custom_interactions(ctx, type : str) :
     # Turn the custom interactions text file into a ascii table and send to the channel
 
     if type == "server" and not server_id == "None" :
-        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+        storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_server")}{server_id}.txt'
 
     elif type == "user" :
-        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+        storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}{user_id}.txt'
     
     else : 
-        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]", ephemeral=True)
+        await ctx.response.send_message(embed=embeds.user_server_type_error() , ephemeral=True)
         return
 
     if not os.path.isfile(storage_file_name) :
-        await ctx.response.send_message("{} does not have any custom interactions :(".format(type), ephemeral=True)
+        await ctx.response.send_message(embed=embeds.no_interactions(type), ephemeral=True)
         return
 
 
@@ -345,14 +345,14 @@ async def custom_interactions(ctx, type : str) :
     for i in range(len(raw)//2) :
         trigger = client.filter_emoji(raw[2*i].replace("\n", "")[1:-1])
         response = client.filter_emoji(raw[2*i+1].replace("\n", ""))
-        table += "│{:30s}│{:90s}│\n".format(" \'{}\'".format(trigger), " {}".format(response))
+        table += "│{:30s}│{:90s}│\n".format(f' \'{trigger}\'', f' {response}')
         table += "├──────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤\n"
     table += "└──────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────┘`"
 
     try :
-        await ctx.response.send_message("**List of {} interactions :**{}".format(type, table), ephemeral=True)
+        await ctx.response.send_message(f'**List of {type} interactions :**{table}', ephemeral=True)
     except :
-        await ctx.response.send_message("**List of {} interactions :**".format(type), file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
+        await ctx.response.send_message(f'**List of {type} interactions :**', file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
 # Say Commands
 
@@ -363,12 +363,12 @@ async def hello(ctx):
 @client.tree.command(name="sparkle", description="Adds sparkles (✨) around a message")
 @app_commands.describe(message = "Message to sparkle")
 async def sparkle(ctx, message : str) :
-    await ctx.response.send_message(":sparkles: {} :sparkles:".format(message))
+    await ctx.response.send_message(f':sparkles: {message} :sparkles:')
 
 
 @client.tree.command(name="make_quirky", description="Types a message out in aLtErNaTiNg CaPs")
 @app_commands.describe(message = "Message to make quirky")
-async def sparkle(ctx, message : str) :
+async def make_quirky(ctx, message : str) :
     output_message = ""
     caps = False
     for char in message :
@@ -399,22 +399,22 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
     storage_file_name = None
     if type == "server" and not server_id == "None" :
         if ctx.user.guild_permissions.administrator :
-            storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+            storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_server")}{server_id}.txt'
         else :
-            await ctx.response.send_message("You must be an Admin to make server-wide interactions", ephemeral=True)
+            await ctx.response.send_message(embed=embeds.permission_error(), ephemeral=True)
 
     elif type == "user" :
-        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+        storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}{user_id}.txt'
         
     else : 
-        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]" , ephemeral=True)
+        await ctx.response.send_message(embed=embeds.user_server_type_error , ephemeral=True)
         return
     
     storage_file = Storage_File(storage_file_name)
     
-    if storage_file.header_exists(trigger) :
+    if os.path.isfile(storage_file_name) and storage_file.header_exists(trigger) :
         existing_response = storage_file.find_content(trigger)
-        storage_file.edit_content(trigger, "{} | {}".format(existing_response, response))
+        storage_file.edit_content(trigger, f'{existing_response} | {response}')
     
     else :
     
@@ -422,11 +422,12 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
             storage_file.add_item(trigger, response)
 
         except :
-            await ctx.response.send_message("Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)" , ephemeral=True)
+            embed = discord.Embed(title="Uh oh", description="Adding the interaction failed!\n\nPlease check that all characters are in utf-8 format (Most standard characters)", color=embeds.red)
+            await ctx.response.send_message(embed=embed , ephemeral=True)
             return
     
-
-    await ctx.response.send_message("Added {} interaction:\n **{}** --> **{}**".format(type, trigger, response), ephemeral=(type=="user"))
+    embed = discord.Embed(title=f'Added {type} interaction', description=f'**{trigger}**  :arrow_right:  {response}', color=embeds.green)
+    await ctx.response.send_message(embed=embed, ephemeral=(type=="user"))
 
 @client.tree.command(name="delete_interaction", description="Deletes a custom server or user interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase to delete")
@@ -438,24 +439,31 @@ async def delete_interaction(ctx, type : str, trigger : str) :
     storage_file_name = None
     if type == "server" and not server_id == "None" :
         if ctx.user.guild_permissions.administrator :
-            storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_server"), server_id)
+            storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_server")}{server_id}.txt'
         else :
-            await ctx.response.send_message("You must be an Admin to delete server-wide interactions", ephemeral=True)
+            await ctx.response.send_message(embed=embeds.permission_error(), ephemeral=True)
 
     elif type == "user" :
-        storage_file_name = "{}{}{}{}.txt".format(storage.get("primary_directory"),storage.get("custom_interactions_directory"), storage.get("custom_interactions_user"), user_id)
+        storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}{user_id}.txt'
         
     else : 
-        await ctx.response.send_message("Invalid `type` argument. Please enter [user/server]", ephemeral=True)
+        await ctx.response.send_message(embed=embeds.user_server_type_error() , ephemeral=True)
         return
+    
+    if not os.path.isfile(storage_file_name) :
+        await ctx.response.send_message(embed=embeds.no_interactions(type), ephemeral=True)
+        return
+
     
     storage_file = Storage_File(storage_file_name)
 
     if storage_file.header_exists(trigger) :
         storage_file.delete_item(trigger)
-        await ctx.response.send_message("Deleted {} interaction: **{}**".format(type, trigger), ephemeral=(type=="user"))
+        embed = discord.Embed(title=f'Deleted interaction', description=f'{type.title()} interaction **{trigger}** has been deleted',color=embeds.red)
+        await ctx.response.send_message(embed=embed, ephemeral=(type=="user"))
     else :
-        await ctx.response.send_message("{} interaction: **{}** does not exist.".format(type, trigger), ephemeral=True)
+        embed = discord.Embed(title="Interaction not found", description=f'{type.title()} interaction **{trigger}** does not exist', color=embeds.amber)
+        await ctx.response.send_message(embed=embed, ephemeral=True)
 
 # Economy Commands
 
@@ -464,7 +472,7 @@ async def daily_food(ctx) :
     user_id = str(ctx.user.id)
     day = time.localtime().tm_yday
     if user_id in client.daily_food_timestamp and client.daily_food_timestamp[user_id] == day :
-        embed = discord.Embed(title="Luna's already been fed", description="Wait until tomorrow to feed Luna again", color=0xff0000)
+        embed = discord.Embed(title="Luna's already been fed", description="Wait until tomorrow to feed Luna again", color=embeds.red)
         await ctx.response.send_message(embed=embed, ephemeral=True)
     else :
         client.daily_food_timestamp[user_id] = day
@@ -480,8 +488,8 @@ async def play(ctx) :
     if user_id in client.play_timestamp :
         target_epoch = client.play_timestamp[user_id] + (break_min * 60)
         if epoch < target_epoch :
-            embed = discord.Embed(title="Luna's tired", description="Luna needs a break from playing", color=0xff0000)
-            embed.add_field(name="Come Back In", value="{} minute(s)".format(str(math.ceil((client.play_timestamp[user_id] + (break_min * 60) - epoch)/60))))
+            embed = discord.Embed(title="Luna's tired", description="Luna needs a break from playing", color=embeds.red)
+            embed.add_field(name="Come Back In", value=f'{math.ceil((target_epoch - epoch)/60)} minute(s)')
             await ctx.response.send_message(embed=embed, ephemeral=True)
             return
         
@@ -500,8 +508,8 @@ async def balance(ctx, user : discord.User = None) :
         user_id = user.id
 
     balance = client.get_balance(user_id)
-    embed = discord.Embed(title="{}'s Wallet".format(user.name), description="Wallet Details", color=0x00ff55)
-    embed.add_field(name="Balance", value="{} {}".format(str(balance), luna_assets.coin_symbol), inline=False)
+    embed = discord.Embed(title=f'{user.name}\'s Wallet', description="Wallet Details", color=embeds.green)
+    embed.add_field(name="Balance", value=f'{str(balance)} {luna_assets.coin_symbol}', inline=False)
     await ctx.response.send_message(embed=embed, ephemeral=True)
 
 client.run(TOKEN)
