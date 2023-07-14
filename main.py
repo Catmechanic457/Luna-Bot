@@ -198,7 +198,7 @@ class LunaBot(commands.Bot, Responses) :
         
     
     async def enact(self, ctx, title, action : actions.Action, negative_chance) -> int :
-        description = action.get_description()
+        description = action.get_description(ctx.user.name)
         response = None
         reward = None
 
@@ -214,7 +214,7 @@ class LunaBot(commands.Bot, Responses) :
         embed.add_field(name=description, value=response, inline=False)
         embed.add_field(name="Result", value=f'{reward} {luna_assets.coin_symbol}')
         
-        await ctx.response.send_message(embed=embed, ephemeral=True)
+        await ctx.response.send_message(embed=embed)
 
         return reward
 
