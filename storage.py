@@ -24,7 +24,7 @@ class Storage :
     
 class Storage_File :
 
-    def __init__(self, file_location) -> None :
+    def __init__(self, file_location : str) -> None :
         self.file_location = file_location
 
         

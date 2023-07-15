@@ -29,12 +29,12 @@ enable_slash_commands = config_file.find_content("enable_slash_commands") == "Tr
 
 
 class Interaction :
-    def __init__(self, response_function : str, description : str = "No Description") :
+    def __init__(self, response_function : str, description : str = "No Description") -> None :
         self.function = response_function
         self.description = description
     
-    def get_reply_content(self) : return self.function()
-    def get_description(self) : return self.description
+    def get_reply_content(self) -> str : return self.function()
+    def get_description(self) -> str : return self.description
         
 
 class LunaBot(commands.Bot, Responses) :
@@ -44,7 +44,7 @@ class LunaBot(commands.Bot, Responses) :
     play_timestamp = {}
     
     
-    def interaction_key(self) :
+    def interaction_key(self) -> str :
 
         # Interactions
         caught_attention = Interaction(self.caught_attention, "Gets Luna's Attention")
@@ -80,14 +80,14 @@ class LunaBot(commands.Bot, Responses) :
 
         return intercept
 
-    def intercept(self, message) :
+    def intercept(self, message : str) -> str | None :
         if self.interaction_key().setdefault(message) :
             reply = self.interaction_key().setdefault(message).get_reply_content()
             return reply
         else : return None
     
 
-    def filter_emoji(self, text) :
+    def filter_emoji(self, text : str) -> str :
         # Used for tables
         substitution_table = {
             "✨" : "sparkle_emoji "
@@ -96,7 +96,7 @@ class LunaBot(commands.Bot, Responses) :
             text = text.replace(key, substitution_table[key])
         return text
     
-    def unprompted_message(self) :
+    def unprompted_message(self) -> str | None :
         system_time = time.localtime()
         if system_time.tm_hour == 0 and not system_time.tm_yday == self.last_wished_date :
             self.last_wished_date = system_time.tm_yday
@@ -108,7 +108,7 @@ class LunaBot(commands.Bot, Responses) :
                 ])
         return None
 
-    def substitutions(self) :
+    def substitutions(self) -> dict[str, str]:
         substitution_table = {
             "✨" : ":sparkles:",
             "✨✨" : ":sparkles:",
@@ -140,7 +140,7 @@ class LunaBot(commands.Bot, Responses) :
         }
         return substitution_table
     
-    def cleanse_input(self, message) :
+    def cleanse_input(self, message : str) -> str :
         message = message.replace(" ", "")
         message = message.lower()
 
@@ -153,7 +153,7 @@ class LunaBot(commands.Bot, Responses) :
         
         return message
     
-    def custom_interaction(self, message, user_id, server_id) :
+    def custom_interaction(self, message : str, user_id : int, server_id : int) -> str | None :
         user_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}{user_id}.txt'
         server_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_server")}{server_id}.txt'
         file_name = None
@@ -169,13 +169,13 @@ class LunaBot(commands.Bot, Responses) :
         
         return None
     
-    def get_guild_id(self, message_object) -> str | None :
+    def get_guild_id(self, message_object : discord.Message | discord.interactions.Interaction) -> str | None :
         try :
             return message_object.guild.id
         except :
             return None
     
-    def edit_balance(self, user_id, amount) :
+    def edit_balance(self, user_id : int, amount : int) -> None :
         user_file_name = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{user_id}.txt'
         user_file = Storage_File(user_file_name)
         if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
@@ -187,7 +187,7 @@ class LunaBot(commands.Bot, Responses) :
             if amount < 0 : amount = 0
             user_file.add_item("balance", str(amount))
     
-    def get_balance(self, user_id) -> int :
+    def get_balance(self, user_id : int) -> int :
         user_file_name = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{user_id}.txt'
         user_file = Storage_File(user_file_name)
         if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
@@ -197,7 +197,7 @@ class LunaBot(commands.Bot, Responses) :
             return 0
         
     
-    async def enact(self, ctx, title, action : actions.Action, negative_chance) -> int :
+    async def enact(self, ctx : discord.interactions.Interaction, title : str, action : actions.Action, negative_chance : int) -> int :
         description = action.get_description(ctx.user.name)
         response = None
         reward = None
@@ -229,7 +229,7 @@ client = LunaBot(command_prefix='/', intents=intents)
 
 
 @client.event
-async def on_ready():
+async def on_ready() -> None :
     # When the bot logs on
     print('Luna is ready')
     try :
@@ -241,7 +241,7 @@ async def on_ready():
         
     
 @client.event
-async def on_message(message):
+async def on_message(message : discord.Message) -> None :
 
     if message.author == client.user : return # Do nothing if the message author is ourselves
 
@@ -283,7 +283,7 @@ async def on_message(message):
 # Info Commands
 
 @client.tree.command(name="interactions", description="Lists all default interactions")
-async def interactions(ctx) :
+async def interactions(ctx : discord.interactions.Interaction) -> None :
     # Turn the interactions dictionary into a ascii table and send to the channel
     interaction_key = client.interaction_key()
     table = "`\n┌──────────────────────────────┬─────────────────────────────────────────────┐\n├──────────────────────────────┼─────────────────────────────────────────────┤\n"
@@ -298,7 +298,7 @@ async def interactions(ctx) :
         await ctx.response.send_message("**List of interactions :**", file=discord.File(BytesIO(str.encode(table)), "members.txt"), ephemeral=True)
 
 @client.tree.command(name="substitutions", description="Lists all default substitutions")
-async def substitutions(ctx) :
+async def substitutions(ctx : discord.interactions.Interaction) -> None :
     # Turn the interactions dictionary into a ascii table and send to the channel
     substitution_key = client.substitutions()
     table = "`\n┌─────────────────────────────────────────────┬───────────────┐\n├─────────────────────────────────────────────┼───────────────┤\n"
@@ -314,7 +314,7 @@ async def substitutions(ctx) :
 
 @client.tree.command(name="custom_interactions", description="Lists all custom server or user interactions")
 @app_commands.describe(type = "[user/server]")
-async def custom_interactions(ctx, type : str) :
+async def custom_interactions(ctx : discord.interactions.Interaction, type : str) -> None :
     type = type.lower()
     server_id = str(client.get_guild_id(ctx))
     user_id = str(ctx.user.id)
@@ -357,18 +357,18 @@ async def custom_interactions(ctx, type : str) :
 # Say Commands
 
 @client.tree.command(name="hello", description = "Checks Luna is alive and kicking")
-async def hello(ctx):
+async def hello(ctx : discord.interactions.Interaction) -> None :
     await ctx.response.send_message(f'Meow. I\'m here {ctx.user.mention}', ephemeral=True)
 
 @client.tree.command(name="sparkle", description="Adds sparkles (✨) around a message")
 @app_commands.describe(message = "Message to sparkle")
-async def sparkle(ctx, message : str) :
+async def sparkle(ctx : discord.interactions.Interaction, message : str) -> None :
     await ctx.response.send_message(f':sparkles: {message} :sparkles:')
 
 
 @client.tree.command(name="make_quirky", description="Types a message out in aLtErNaTiNg CaPs")
 @app_commands.describe(message = "Message to make quirky")
-async def make_quirky(ctx, message : str) :
+async def make_quirky(ctx : discord.interactions.Interaction, message : str) -> None :
     output_message = ""
     caps = False
     for char in message :
@@ -384,14 +384,14 @@ async def make_quirky(ctx, message : str) :
 
 @client.tree.command(name="say", description = "Sends a message as Luna")
 @app_commands.describe(message = "Message to say as Luna Bot")
-async def say(ctx, message : str) :
+async def say(ctx : discord.interactions.Interaction, message : str) -> None :
     await ctx.response.send_message(message)
 
 # Utility Commands
 
 @client.tree.command(name="add_interaction", description="Adds a custom server or user interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase Luna looks for", response = "Luna's response")
-async def add_interaction(ctx, type : str, trigger : str, response : str) :
+async def add_interaction(ctx : discord.interactions.Interaction, type : str, trigger : str, response : str) -> None :
     type = type.lower()
     trigger = client.cleanse_input(trigger)
     server_id = str(client.get_guild_id(ctx))
@@ -431,7 +431,7 @@ async def add_interaction(ctx, type : str, trigger : str, response : str) :
 
 @client.tree.command(name="delete_interaction", description="Deletes a custom server or user interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase to delete")
-async def delete_interaction(ctx, type : str, trigger : str) :
+async def delete_interaction(ctx : discord.interactions.Interaction, type : str, trigger : str) -> None :
     type = type.lower()
     trigger = client.cleanse_input(trigger)
     server_id = str(client.get_guild_id(ctx))
@@ -468,7 +468,7 @@ async def delete_interaction(ctx, type : str, trigger : str) :
 # Economy Commands
 
 @client.tree.command(name="daily_food", description="Gives Luna her daily bowl of food. Hopefully she likes it")
-async def daily_food(ctx) :
+async def daily_food(ctx : discord.interactions.Interaction) -> None :
     user_id = str(ctx.user.id)
     day = time.localtime().tm_yday
     if user_id in client.daily_food_timestamp and client.daily_food_timestamp[user_id] == day :
@@ -481,7 +481,7 @@ async def daily_food(ctx) :
 
 
 @client.tree.command(name="play", description="Play with luna to increase or decrease your Purr Points")
-async def play(ctx) :
+async def play(ctx : discord.interactions.Interaction) -> None :
     user_id = str(ctx.user.id)
     epoch = time.time()
     break_min = 15
@@ -500,7 +500,7 @@ async def play(ctx) :
 
 @client.tree.command(name="balance", description="Tells you how many Purr Points is in your wallet")
 @app_commands.describe(user = "user")
-async def balance(ctx, user : discord.User = None) :
+async def balance(ctx : discord.interactions.Interaction, user : discord.User = None) -> None :
     if user == None :
         user_id = str(ctx.user.id)
         user = ctx.user

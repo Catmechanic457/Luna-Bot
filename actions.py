@@ -1,14 +1,14 @@
 from random import *
 
 class Action :
-    def __init__(self, action_descriptions : list[str], positive_responses : list[str], negative_responses : list[str], rate_positive : int, rate_negative : int) -> int :
+    def __init__(self, action_descriptions : list[str], positive_responses : list[str], negative_responses : list[str], rate_positive : int, rate_negative : int) -> None :
         self.action_descriptions = action_descriptions
         self.positive_responses = positive_responses
         self.negative_responses = negative_responses
         self.rate_positive = rate_positive
         self.rate_negative = -abs(rate_negative)
     
-    def get_description(self, user_name) -> str :
+    def get_description(self, user_name : str) -> str :
         return choice(self.action_descriptions).format(user_name)
     
     def get_positive(self) -> str :
