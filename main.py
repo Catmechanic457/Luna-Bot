@@ -219,7 +219,7 @@ class LunaBot(commands.Bot, Responses) :
         return reward
 
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.message_content = True
 
 
@@ -511,5 +511,41 @@ async def balance(ctx : discord.interactions.Interaction, user : discord.User = 
     embed = discord.Embed(title=f'{user.name}\'s Wallet', description="Wallet Details", color=embeds.green)
     embed.add_field(name="Balance", value=f'{str(balance)} {luna_assets.coin_symbol}', inline=False)
     await ctx.response.send_message(embed=embed, ephemeral=True)
+
+@client.tree.command(name="leaderboard", description="Lists the richest players on the server")
+async def leaderboard(ctx : discord.interactions.Interaction) -> None :
+
+    if ctx.guild == None :
+        await ctx.response.send_message(embed=embeds.not_in_server())
+        return
+
+
+    members = ctx.guild.members
+    leaderboard = {}
+    for member in members:
+        user_id = member.id
+        user_file_name = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{user_id}.txt'
+        user_file = Storage_File(user_file_name)
+        if os.path.isfile(user_file_name) and user_file.header_exists("balance") :
+            leaderboard[member] = int(user_file.find_content("balance"))
+        
+        else :
+            leaderboard[member] = 0
+    
+    leaderboard = dict(sorted(leaderboard.items(), key=lambda x:x[1], reverse=True))
+    
+    await ctx.response.send_message(embed=embeds.create_leaderboard(leaderboard, ctx.guild.name), ephemeral=True)
+
+@client.tree.command(name="leaderboard_global", description="Lists the richest players globally")
+async def leaderboard_global(ctx : discord.interactions.Interaction) -> None :
+
+    directory = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}'
+    leaderboard = {}
+    for filename in os.listdir(directory) :
+        leaderboard[client.get_user(int(filename.replace(".txt", "")))] = int(Storage_File(f'{directory}{filename}').find_content("balance"))
+    
+    leaderboard = dict(sorted(leaderboard.items(), key=lambda x:x[1], reverse=True))
+    
+    await ctx.response.send_message(embed=embeds.create_leaderboard(leaderboard, "Discord"), ephemeral=True)
 
 client.run(TOKEN)
