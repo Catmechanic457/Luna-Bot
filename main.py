@@ -407,7 +407,7 @@ async def add_interaction(ctx : discord.interactions.Interaction, type : str, tr
         storage_file_name = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}{user_id}.txt'
         
     else : 
-        await ctx.response.send_message(embed=embeds.user_server_type_error , ephemeral=True)
+        await ctx.response.send_message(embed=embeds.user_server_type_error() , ephemeral=True)
         return
     
     storage_file = Storage_File(storage_file_name)
