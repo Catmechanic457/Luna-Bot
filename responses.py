@@ -9,7 +9,8 @@ class Responses :
                 "What? Where?",
                 "What is it?",
                 "I SWEAR I JUST HEARD MY NAME",
-                "WHO SAID THAT?"
+                "WHO SAID THAT?",
+                "# W H A T"
             ]
             return choice(response_pool)
         
@@ -21,7 +22,9 @@ class Responses :
             "Get away ya Demon!",
             "nonono You Get back, Demon!",
             "Why does that laugh sound so demonic?",
-            "\*hisses\*"
+            "\*hisses\*",
+            "Get back demon!"
+
         ]
         return choice(response_pool)
     
@@ -30,6 +33,8 @@ class Responses :
             "Omgo it's sparkly!",
             "^_^ Sparkly",
             "Ohh it shiny",
+            "## Sparklz",
+            "ooOOOhhh it's shiny"
             ":sparkles:",
             ":sparkles: :sparkles:",
             ":sparkles: :sparkles: :sparkles:"
@@ -91,7 +96,8 @@ class Responses :
             "Oh please im a CAT",
             "I aint no CHILD",
             "I'M NOT A KITTEN",
-            "I'M NOT A CHILDDD"
+            "I'M NOT A CHILDDD",
+            "# NO"
         ]
         return choice(response_pool)
     
@@ -104,6 +110,7 @@ class Responses :
             "Mewww",
             "Maouu",
             "MMeeow",
+            "# M E O W"
             "M E O W",
             "m e o w",
             "moo",
