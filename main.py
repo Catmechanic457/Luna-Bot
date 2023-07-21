@@ -42,6 +42,7 @@ class LunaBot(commands.Bot, Responses) :
     last_wished_date = None
     daily_food_timestamp = {}
     play_timestamp = {}
+    whisper_timestamp = {}
     
     
     def interaction_key(self) -> str :
@@ -464,6 +465,38 @@ async def delete_interaction(ctx : discord.interactions.Interaction, type : str,
     else :
         embed = discord.Embed(title="Interaction not found", description=f'{type.title()} interaction **{trigger}** does not exist', color=embeds.amber)
         await ctx.response.send_message(embed=embed, ephemeral=True)
+
+@client.tree.command(name="whisper", description="Send an anonymous DM to another member")
+@app_commands.describe(user = "user", message = "Message to send")
+async def play(ctx : discord.interactions.Interaction, user : discord.User, message : str) -> None :
+    user_id = ctx.user.id
+    epoch = time.time()
+    break_min = 120
+    if user_id in client.whisper_timestamp :
+        target_epoch = client.whisper_timestamp[user_id] + (break_min * 60)
+        if epoch < target_epoch :
+            time_in_seconds = target_epoch - epoch
+            mins = math.floor((time_in_seconds/60)%60)
+            hours = int(time_in_seconds//3600)
+            if hours == 0 : hours = ""
+            else : hours = f'{hours} hour(s)'
+            embed = discord.Embed(title="Easy there", description="Let's not be sending too many secret messages", color=embeds.red)
+            embed.add_field(name="Come Back In", value=f'{hours} {mins} minute(s)')
+            await ctx.response.send_message(embed=embed, ephemeral=True)
+            return
+        
+    try :
+        await user.send(message)
+    except :
+        embed = discord.Embed(title="Uh oh!", description="Something went wrong and the message was not sent, please try again later", color=embeds.red)
+        await ctx.response.send_message(embed=embed, ephemeral=True)
+        return
+    
+    client.whisper_timestamp[user_id] = epoch
+
+    embed = discord.Embed(title="Message sent", description="Lets hope they like it", color=embeds.green)
+    await ctx.response.send_message(embed=embed, ephemeral=True)
+    
 
 # Economy Commands
 
