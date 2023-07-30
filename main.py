@@ -6,6 +6,7 @@ from responses import Responses
 from storage import *
 import actions
 import luna_assets
+from experience import XP
 
 import os
 import time
@@ -202,23 +203,33 @@ class LunaBot(commands.Bot, Responses) :
         description = action.get_description(ctx.user.name)
         response = None
         reward = None
+        charisma_embed = None
 
         positive = randint(1,negative_chance) != 1
         if positive :
             response = action.get_positive()
             reward = action.get_positive_score()
+            if randint(0,1) == 0 : charisma_embed = self.edit_charisma(ctx, randint(5,30))
         else :
             response = action.get_negative()
             reward = action.get_negative_score()
+            if randint(0,2) == 0 : charisma_embed = self.edit_charisma(ctx, randint(-30,-5))
         
         embed = discord.Embed(title=title, color=embeds.green)
         embed.add_field(name=description, value=response, inline=False)
         embed.add_field(name="Result", value=f'{reward} {luna_assets.coin_symbol}')
         
         await ctx.response.send_message(embed=embed)
+        if charisma_embed : await ctx.user.send(embed=charisma_embed)
 
         return reward
 
+    def edit_charisma(self, ctx : discord.interactions.Interaction, value : int, message = None) -> discord.Embed :
+        file_name = f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{ctx.user.id}.txt'
+        user_xp = XP(file_name)
+        user_xp.edit(value)
+        change_embed = embeds.experience_change(ctx, file_name, value, message)
+        return change_embed
 
 intents = discord.Intents.all()
 intents.message_content = True
@@ -255,6 +266,9 @@ async def on_message(message : discord.Message) -> None :
         # Intercepts any non-command msgs
         intercept = client.intercept(filtered_input)
         if intercept :
+            if randint(0,3) == 0 :
+                user_xp = XP(f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{message.author.id}.txt')
+                user_xp.edit(randint(1,3))
             print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{intercept}\'')
             await channel.send(intercept)
     
@@ -580,5 +594,11 @@ async def leaderboard_global(ctx : discord.interactions.Interaction) -> None :
     leaderboard = dict(sorted(leaderboard.items(), key=lambda x:x[1], reverse=True))
     
     await ctx.response.send_message(embed=embeds.create_leaderboard(leaderboard, "Discord"), ephemeral=True)
+
+# XP
+
+@client.tree.command(name="experience", description=luna_assets.msg_no_description)
+async def experience(ctx : discord.interactions.Interaction) -> None :
+    await ctx.response.send_message(embed=embeds.experience_info(ctx, f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{ctx.user.id}.txt'), ephemeral=False)
 
 client.run(TOKEN)
