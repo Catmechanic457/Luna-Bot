@@ -220,7 +220,7 @@ class LunaBot(commands.Bot, Responses) :
         embed.add_field(name="Result", value=f'{reward} {luna_assets.coin_symbol}')
         
         await ctx.response.send_message(embed=embed)
-        if charisma_embed : await ctx.user.send(embed=charisma_embed)
+        if charisma_embed : await ctx.channel.send(embed=charisma_embed)
 
         return reward
 
