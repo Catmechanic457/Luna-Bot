@@ -209,11 +209,11 @@ class LunaBot(commands.Bot, Responses) :
         if positive :
             response = action.get_positive()
             reward = action.get_positive_score()
-            if randint(0,1) == 0 : charisma_embed = self.edit_charisma(ctx, randint(5,30))
+            if randint(0,1) == 0 : charisma_embed = self.edit_charisma(ctx, randint(20,100))
         else :
             response = action.get_negative()
             reward = action.get_negative_score()
-            if randint(0,2) == 0 : charisma_embed = self.edit_charisma(ctx, randint(-30,-5))
+            if randint(0,2) == 0 : charisma_embed = self.edit_charisma(ctx, randint(-30,-10))
         
         embed = discord.Embed(title=title, color=embeds.green)
         embed.add_field(name=description, value=response, inline=False)
@@ -268,7 +268,7 @@ async def on_message(message : discord.Message) -> None :
         if intercept :
             if randint(0,3) == 0 :
                 user_xp = XP(f'{storage.get("primary_directory")}{storage.get("user_data_directory")}{message.author.id}.txt')
-                user_xp.edit(randint(1,3))
+                user_xp.edit(randint(10,20))
             print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{intercept}\'')
             await channel.send(intercept)
     
