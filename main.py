@@ -913,13 +913,13 @@ async def leaderboard_global(ctx : discord.interactions.Interaction) -> None :
 
 # XP
 
-@client.tree.command(name="experience", description=luna_assets.msg_no_description)
+@client.tree.command(name="experience", description="Displays your current Charisma (XP) level")
 async def experience(ctx : discord.interactions.Interaction) -> None :
     await ctx.response.send_message(embed=embeds.experience_info(ctx, f'{user_data_path}{ctx.user.id}.txt'), ephemeral=False)
 
 # Items
 
-@client.tree.command(name="inventory", description=luna_assets.msg_no_description)
+@client.tree.command(name="inventory", description="Lists the items in your inventory and the actions you can preform")
 async def inventory(ctx : discord.interactions.Interaction) -> None :
     if not client.get_guild_id(ctx) :
         await ctx.response.send_message(embed=embeds.not_in_server(), ephemeral=True)
@@ -992,7 +992,7 @@ async def inventory(ctx : discord.interactions.Interaction) -> None :
     
     await ctx.response.send_message(embed=embeds.no_items(), ephemeral=True)
 
-@client.tree.command(name="shop", description=luna_assets.msg_no_description)
+@client.tree.command(name="shop", description="Opens the item shop where you can spen your Purr Points")
 async def shop(ctx : discord.interactions.Interaction) -> None :
     if not client.get_guild_id(ctx) :
         await ctx.response.send_message(embed=embeds.not_in_server(), ephemeral=True)
