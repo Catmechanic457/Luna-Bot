@@ -4,6 +4,7 @@ class Storage :
     primary_directory = "data/",
     settings_file = "settings.txt",
     config_file = "config.txt",
+    items_directory = "items/",
     user_data_directory = "user_data/",
     custom_interactions_directory = "custom_interactions/",
     custom_interactions_user = "user/",
@@ -13,6 +14,7 @@ class Storage :
             "primary_directory" : primary_directory,
             "settings_file" : settings_file,
             "config_file" : config_file,
+            "items_directory" : items_directory,
             "user_data_directory" : user_data_directory,
             "custom_interactions_directory" : custom_interactions_directory,
             "custom_interactions_user" : custom_interactions_user,
@@ -49,6 +51,7 @@ class Storage_File :
                 if item.replace("\n", "") == "<{}>".format(header) :
                     found_header = True
             else : return item.replace("\n", "")
+        if found_header : return ""
         return None
     
     def add_item(self, header : str, content : str) -> None :
@@ -58,22 +61,22 @@ class Storage_File :
     
     def edit_content(self, header : str, content : str) -> None :
         if not self.header_exists(header) :
-            return
+            return None
         file = open(self.file_location, "r", encoding="utf-8")
         raw = file.readlines()
         file.close()
 
         file = open(self.file_location, "w", encoding="utf-8")
-        found = False
+        found_header = False
         for line in raw :
-            if not found :
+            if not found_header :
                 file.writelines(line)
                 if line.replace("\n", "") == "<{}>".format(header) :
-                    found = True
-
+                    found_header = True
             else :
-                found = False
+                found_header = False
                 file.writelines("{}\n".format(content))
+        if found_header : file.writelines("{}\n".format(content))
                 
 
         file.close()
