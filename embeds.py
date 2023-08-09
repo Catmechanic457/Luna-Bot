@@ -15,6 +15,9 @@ def user_server_type_error() -> Embed :
 def permission_error() -> Embed :
     return Embed(title="Sorry!", description="You must be an Admin to use this command", color=red)
 
+def profound_error() -> Embed :
+    return Embed(title="Luna can't say that", description="The content contains banned terms", color=red)
+
 def no_interactions(type : str) -> Embed :
     return Embed(title="No Interactions", description=f'{type.title()} has no custom interactions', color=amber)
 

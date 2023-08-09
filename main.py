@@ -17,8 +17,11 @@ import math
 import embeds
 import uuid
 import asyncio
+
+from profanity_filter import ProfanityFilter
     
 storage = Storage()
+p_filter = ProfanityFilter(languages=['en'])
 
 custom_interactions_user_path = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_user")}'
 custom_interactions_server_path = f'{storage.get("primary_directory")}{storage.get("custom_interactions_directory")}{storage.get("custom_interactions_server")}'
@@ -723,6 +726,10 @@ async def say(ctx : discord.interactions.Interaction, message : str) -> None :
 @client.tree.command(name="add_interaction", description="Adds a custom server or user interaction")
 @app_commands.describe(type = "[user/server]", trigger = "The phrase Luna looks for", response = "Luna's response")
 async def add_interaction(ctx : discord.interactions.Interaction, type : str, trigger : str, response : str) -> None :
+    if not p_filter.is_clean(response) :
+        await ctx.response.send_message(embed=embeds.profound_error() , ephemeral=True)
+        return
+
     type = type.lower()
     trigger = client.cleanse_input(trigger)
     server_id = str(client.get_guild_id(ctx))
