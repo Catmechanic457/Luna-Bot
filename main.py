@@ -166,16 +166,22 @@ class LunaBot(commands.Bot, Responses) :
     def custom_interaction(self, message : str, user_id : int, server_id : int) -> str | None :
         user_file_name = f'{custom_interactions_user_path}{user_id}.txt'
         server_file_name = f'{custom_interactions_server_path}{server_id}.txt'
-        file_name = None
         if os.path.isfile(user_file_name) :
             user_file = Storage_File(user_file_name)
             user_response = user_file.find_content(message)
             if user_response : return choice(user_response.split("|")).strip()
 
+            response_dict = user_file.as_dict()
+            for item in response_dict :
+                if "\contains\\" in item and item.replace("\contains\\", "") in message : return choice(response_dict[item].split("|")).strip()
+
         if os.path.isfile(server_file_name) :
             server_file = Storage_File(server_file_name)
             server_response = server_file.find_content(message)
             if server_response : return choice(server_response.split("|")).strip()
+            response_dict = server_file.as_dict()
+            for item in response_dict :
+                if "\contains\\" in item and item.replace("\contains\\", "") in message : return choice(response_dict[item].split("|")).strip()
         
         return None
     

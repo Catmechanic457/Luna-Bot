@@ -28,6 +28,17 @@ class Storage_File :
 
     def __init__(self, file_location : str) -> None :
         self.file_location = file_location
+    
+    def as_dict(self) -> dict[str,str] :
+        file = open(self.file_location, "r", encoding="utf-8")
+        raw = file.readlines()
+        file.close()
+        out = {}
+        for i in range(len(raw)//2) :
+            header = raw[i*2].replace("\n", "")[1:-1]
+            content = raw[i*2 + 1].replace("\n","")
+            out[header] = content
+        return out
 
         
     def header_exists(self, header : str) -> bool :
