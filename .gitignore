@@ -1,6 +1,5 @@
-/data/config.txt
 /__pycache__
-/data/custom_interactions/server
-/data/custom_interactions/user
-/data/user_data
-/data/items
+/data/default/config.json
+/data/data.json
+/data/cooldown.json
+todo.txt

@@ -1,0 +1,87 @@
+{
+    "caught_attention": [
+        "Huh? What?",
+        "You Called?",
+        "You Needed Me?",
+        "What? Where?",
+        "What is it?",
+        "I SWEAR I JUST HEARD MY NAME",
+        "WHO SAID THAT?",
+        "# W H A T"
+    ],
+    "demon_spotted": [
+        "Stay back, Demon!",
+        "That's the laugh of the devil...",
+        "Ahhh! Demon!",
+        "Get away ya Demon!",
+        "nonono You Get back, Demon!",
+        "Why does that laugh sound so demonic?",
+        "\\*hisses\\*",
+        "Get back demon!"
+    ],
+    "shiny_spotted": [
+        "Omgo it's sparkly!",
+        "^_^ Sparkly",
+        "Ohh it shiny",
+        "## Sparklz",
+        "ooOOOhhh it's shiny",
+        ":sparkles:",
+        ":sparkles: :sparkles:",
+        ":sparkles: :sparkles: :sparkles:"
+    ],
+    "reaction": [
+        "OMGO",
+        "omgo",
+        "lovely",
+        "woozy",
+        ":sparkles: wozzy :sparkles:",
+        ":sparkles: lovely :sparkles:",
+        ":sparkles:",
+        ":sparkles: :sparkles:",
+        ":sparkles: :sparkles: :sparkles:"
+    ],
+    "emoticon": [
+        ":D",
+        ":)",
+        "ฅ⁠^⁠•⁠ﻌ⁠•⁠^⁠ฅ",
+        "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",
+        "^_^",
+        "=^..^=",
+        "~(^._.)",
+        "(っ◕‿◕)っ",
+        "=^..^= ~(^._.) (っ◕‿◕)っ"
+    ],
+    "grant_sleep": [
+        "Night",
+        "Night Night",
+        "Noight",
+        "Noight Noight",
+        "Ima go slep too",
+        "Yes... Sleep, Child"
+    ],
+    "not_kitten": [
+        "I'm not a kitten I'm a cat",
+        "Don't call me a child!",
+        "I'm not that young...",
+        "Oh please im a CAT",
+        "I aint no CHILD",
+        "I'M NOT A KITTEN",
+        "I'M NOT A CHILDDD",
+        "# NO"
+    ],
+    "meow": [
+        "Meow?",
+        "Meow",
+        "Mau",
+        "Meeoowww",
+        "Mewww",
+        "Maouu",
+        "MMeeow",
+        "# M E O W",
+        "M E O W",
+        "m e o w",
+        "moo",
+        "\\*purrs\\*",
+        "\\*happy cat noises\\*"
+    ]
+}

@@ -1,0 +1,171 @@
+{
+    "pet": {
+        "title_pool": [
+            "{} pets Luna",
+            "{} strokes Luna"
+        ],
+        "positive": {
+            "responses": [
+                "She likes it",
+                "She purrs",
+                "She makes happy cat noises",
+                "She is happy to be pet"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": 65,
+                    "max": 110
+                },
+                "experience": {
+                    "min": 15,
+                    "max": 25
+                }
+            }
+        },
+        "negative": {
+            "responses": [
+                "She suddenly scratches their arm",
+                "She runs away immediately",
+                "She'd rather be getting treats",
+                "She doesn't like it"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": -85,
+                    "max": -40
+                },
+                "experience": {
+                    "min": -20,
+                    "max": -10
+                }
+            }
+        }
+    },
+    "tease": {
+        "title_pool": [
+            "{} teases Luna with some treats",
+            "{} holds some treats just above Luna's head"
+        ],
+        "positive": {
+            "responses": [
+                "She purrs",
+                "She makes happy cat noises",
+                "She likes trying to snatch the treats"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": 140,
+                    "max": 290
+                },
+                "experience": {
+                    "min": 45,
+                    "max": 70
+                }
+            }
+        },
+        "negative": {
+            "responses": [
+                "She suddenly scratches their arm",
+                "She doesn't like getting teased",
+                "She gets frustrated"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": -160,
+                    "max": -75
+                },
+                "experience": {
+                    "min": -55,
+                    "max": -20
+                }
+            }
+        }
+    },
+    "balloon": {
+        "title_pool": [
+            "{} gives Luna a balloon to play with",
+            "{} gives Luna a balloon"
+        ],
+        "positive": {
+            "responses": [
+                "She bats it around, purring",
+                "She happily plays with it",
+                "She wacks it endlessly"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": 50,
+                    "max": 135
+                },
+                "experience": {
+                    "min": 45,
+                    "max": 85
+                }
+            }
+        },
+        "negative": {
+            "responses": [
+                "It suddenly pops",
+                "She doesn't like it",
+                "It pops immediately",
+                "She tries to bite it and it pops"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": -130,
+                    "max": -80
+                },
+                "experience": {
+                    "min": -80,
+                    "max": -55
+                }
+            }
+        }
+    },
+    "give_food": {
+        "title_pool": [
+            "{} gives Luna a big bowl of food",
+            "{} gives Luna her daily portion of food",
+            "{} gives Luna a big scoop of cat food",
+            "{} feeds Luna",
+            "{} gives Luna a pile of food"
+        ],
+        "positive": {
+            "responses": [
+                "She gobbles it all immediately",
+                "She devours it",
+                "She inhales it like Kirby",
+                "She munches on it",
+                "She happily eats it"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": 250,
+                    "max": 550
+                },
+                "experience": {
+                    "min": 80,
+                    "max": 130
+                }
+            }
+        },
+        "negative": {
+            "responses": [
+                "She doesn't like the brand of pet-food",
+                "She walks away without touching it",
+                "She's suddenly not hungry",
+                "he doesn't like it"
+            ],
+            "rewards": {
+                "currency": {
+                    "min": -100,
+                    "max": -60
+                },
+                "experience": {
+                    "min": -30,
+                    "max": -15
+                }
+            }
+        }
+    }
+}
