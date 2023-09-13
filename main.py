@@ -55,7 +55,7 @@ async def on_message(message : discord.Message) -> None :
     # Custom interactions
     if True :
         custom_interactions_file = Custom_Interactions_Group("data/data.json", client.get_guild_id(message), message.author.id)
-        response = custom_interactions_file.get_response(message.content)
+        response = custom_interactions_file.get_response(filtered_input)
         if response :
             print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{response}\'')
             await channel.send(response)
