@@ -12,7 +12,7 @@ class Responses(Data_File) :
     
     def shiny_spotted(self) -> str :
         if randint(0,1) == 0 :
-            return f'{choice(self.data()["demon_spotted"])} {choice(self.data()["emoticon"])}'
+            return f'{choice(self.data()["shiny_spotted"])} {choice(self.data()["emoticon"])}'
         
         return choice(self.data()["shiny_spotted"])
     
