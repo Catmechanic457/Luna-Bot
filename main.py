@@ -116,44 +116,50 @@ async def whisper(ctx : discord.interactions.Interaction, user : discord.User, m
     if not p_filter.is_clean(message) :
         await ctx.response.send_message(embed=embeds.profound_error() , ephemeral=True)
         return
-    cooldown = Cooldown("data/cooldown.json", ctx.user.id, "whisper_command")
-    if cooldown.able() :
-        user_settings_file = User_Settings("data/data.json", user.id) 
-        try :
-            if ctx.user.id in user_settings_file.get_setting("blocked_users") or not user_settings_file.get_setting("accept_whisper") :
-                await ctx.response.send_message(embed=discord.Embed(title="User not accepting DMs", description="You cannot send whispers to this user", color=embeds.red), ephemeral=True)
-                return
-            cooldown.mark(in_seconds(minutes=5,seconds=30))
-            sender = "Anonymous" if anonymous else ctx.user.name
-            embed = discord.Embed(title="Whisper", description="The following message was sent by another user", color=embeds.green)
-            embed.add_field(name="Sender", value=sender)
-            embed.add_field(name="Message", value=message, inline=False)
-            view = discord.ui.View()
-            block_button = discord.ui.Button(label="Block User", style=discord.ButtonStyle.red)
-            opt_out_button = discord.ui.Button(label="Block All", style=discord.ButtonStyle.red)
-            sender_id = ctx.user.id
-            async def block(ctx : discord.interactions.Interaction) -> None :
-                user_settings_file.block(sender_id)
-                await ctx.response.send_message(embed=discord.Embed(title="Blocked user", description="This user can no longer send you whispers", color=embeds.red), ephemeral=True)
-            async def opt_out(ctx : discord.interactions.Interaction) -> None :
-                user_settings_file.edit_setting("accept_whisper", False)
-                await ctx.response.send_message(embed=discord.Embed(title="Blocked all whispers", description="Users can no longer send you whispers", color=embeds.red), ephemeral=True)
-
-            block_button.callback = block
-            opt_out_button.callback = opt_out
-            view.add_item(block_button)
-            view.add_item(opt_out_button)
-            await user.send(embed=embed, view=view)
-        except :
-            await ctx.response.send_message(embed=embeds.error(), ephemeral=True)
-            return
     
-    else :
+    # Catch on cooldown
+    cooldown = Cooldown("data/cooldown.json", ctx.user.id, "whisper_command")
+    if not cooldown.able() :
         await ctx.response.send_message(embed=embeds.cooldown_error(cooldown.formatted_delta()), ephemeral=True)
         return
+    
+    # Catch blocked user
+    user_settings_file = User_Settings("data/data.json", user.id) 
+    if ctx.user.id in user_settings_file.get_setting("blocked_users") or not user_settings_file.get_setting("accept_whisper") :
+        await ctx.response.send_message(embed=discord.Embed(title="User not accepting DMs", description="You cannot send whispers to this user", color=embeds.red), ephemeral=True)
+        return
 
-    embed = discord.Embed(title="Message sent", description=f'"{message}"', color=embeds.green)
-    await ctx.response.send_message(embed=embed, ephemeral=True)
+    sender = "Anonymous" if anonymous else ctx.user.name
+
+    embed = discord.Embed(title=message, description="", color=embeds.green)
+    embed.add_field(name="Sender", value=sender)
+    view = discord.ui.View()
+    block_button = discord.ui.Button(label="Block User", style=discord.ButtonStyle.red)
+    opt_out_button = discord.ui.Button(label="Block All", style=discord.ButtonStyle.red)
+
+    sender_id = ctx.user.id
+    async def block(ctx : discord.interactions.Interaction) -> None :
+        user_settings_file.block(sender_id)
+        await ctx.response.send_message(embed=discord.Embed(title="Blocked user", description="This user can no longer send you whispers", color=embeds.red), ephemeral=True)
+
+    async def opt_out(ctx : discord.interactions.Interaction) -> None :
+        user_settings_file.edit_setting("accept_whisper", False)
+        await ctx.response.send_message(embed=discord.Embed(title="Blocked all whispers", description="Users can no longer send you whispers", color=embeds.red), ephemeral=True)
+
+    block_button.callback = block
+    opt_out_button.callback = opt_out
+    view.add_item(block_button)
+    view.add_item(opt_out_button)
+
+    await ctx.response.send_message(embed=discord.Embed(title="Sending message", description="Please wait...", color=embeds.amber), ephemeral=True)
+    try :
+        await user.send(embed=embed, view=view)
+        await ctx.edit_original_response(embed=discord.Embed(title="Message sent", description=f'"{message}"', color=embeds.green))
+        cooldown.mark(in_seconds(minutes=5,seconds=30))
+    except Exception as e:
+        print(e)
+        await ctx.edit_original_response(embed=embeds.error())
+        return
 
 @client.tree.command(name="block", description="Block a user from sending whispers")
 @app_commands.describe(user = "user")
