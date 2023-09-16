@@ -32,10 +32,12 @@ class User_Settings(Data) :
     
     def block(self, user_id : int) -> None :
         data = self.data()
+        if user_id in data["user"][self.id]["settings"]["blocked_users"] : return
         data["user"][self.id]["settings"]["blocked_users"].append(user_id)
         self.write(data)
     
     def unblock(self, user_id : int) -> None :
         data = self.data()
+        if user_id in data["user"][self.id]["settings"]["blocked_users"] : return
         data["user"][self.id]["settings"]["blocked_users"].remove(user_id)
         self.write(data)
