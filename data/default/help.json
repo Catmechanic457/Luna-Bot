@@ -1,0 +1,153 @@
+{
+    "default_interactions": {
+        "title": "Default Interactions",
+        "description": "Luna will respond to certain phrases that you send in any channel she's part of and had send_message permissions in.",
+        "color": 16711680,
+        "commands": {
+            "interactions default list": {
+                "description": "Lists all of the default interactions.",
+                "parameters": {}
+            }
+        }
+    },
+    "custom_interactions": {
+        "title": "Custom Interactions",
+        "description": "Custom interactions work the same way as default interactions. Custom interactions can be bound by user or bound by server. Only server administrators can create server-wide custom interactions.",
+        "color": 14881497,
+        "commands": {
+            "interactions custom list": {
+                "description": "Lists custom interactions.",
+                "parameters": {
+                    "type": "Must be either 'user' or 'server' to list all user-bound or server-bound custom interactions"
+                }
+            },
+            "interactions custom add": {
+                "description": "Create a custom interaction.",
+                "parameters": {
+                    "type": "Must be either 'user' or 'server' to add a user-bound or server-bound custom interaction",
+                    "trigger": "The phrase Luna looks for. Upper-case and spaces will be ignored. Adding '\\contains\\\\' at the start of the trigger will make Luna respond to any message containing the phrase anywhere in it's content",
+                    "response": "The phrase Luna should respond with. Separate possible responses with a '|'"
+                }
+            },
+            "interactions custom delete": {
+                "description": "Delete a custom interaction.",
+                "parameters": {
+                    "type": "Must be either 'user' or 'server' to delete a user-bound or server-bound custom interaction",
+                    "trigger": "The phrase associated with the interaction you're trying to delete"
+                }
+            }
+        }
+    },
+    "economy": {
+        "title": "Economy",
+        "description": "Luna Bot has an economy system. Earn coins by playing with Luna. The highest net-worth accounts will be displayed on the leaderboard.",
+        "color": 65365,
+        "commands": {
+            "balance": {
+                "description": "Display the contents of a user's wallet.",
+                "parameters": {
+                    "user": "(Optional) Target user"
+                }
+            },
+            "daily": {
+                "description": "Feed Luna her daily portion of food to earn a reward.",
+                "parameters": {}
+            },
+            "play": {
+                "description": "Play with Luna to receive rewards.",
+                "parameters": {}
+            },
+            "leaderboard server": {
+                "description": "Displays the richest users on the server.",
+                "parameters": {}
+            },
+            "leaderboard global": {
+                "description": "Displays the richest users on Discord.",
+                "parameters": {}
+            }
+        }
+    },
+    "items": {
+        "title": "Items",
+        "description": "Luna Bot's item system consists of items that can be bought, used and sold. Items can grant rewards, experience and more.",
+        "color": 65535,
+        "commands": {
+            "shop": {
+                "description": "Browse items to purchase with your coins. Use the reactions to navigate the menu.",
+                "parameters": {}
+            },
+            "inventory": {
+                "description": "Displays the contents of your inventory and the actions that can be taken for each item. Use the reactions to navigate the menu.",
+                "parameters": {}
+            }
+        }
+    },
+    "experience": {
+        "title": "Experience",
+        "description": "Luna Bot has an XP system called Charisma. Earn Charisma by interacting with Luna, using items, or playing with Luna. Increasing your level unlocks items and rewards.",
+        "color": 16768256,
+        "commands": {
+            "experience": {
+                "description": "Display your current level.",
+                "parameters": {}
+            }
+        }
+    },
+    "whisper": {
+        "title": "Whisper",
+        "description": "With Luna Bot, you can send secret messages to all your friends.",
+        "color": 65365,
+        "commands": {
+            "whisper": {
+                "description": "Sends a user a DM from Luna Bot.",
+                "parameters": {
+                    "user": "The recipient",
+                    "anonymous": "(Optional) Must be either 'True' or 'False' to indicate whether you would like the recipient to know who sent the DM"
+                }
+            },
+            "block": {
+                "description": "Prevents a user from sending you whispers.",
+                "parameters": {
+                    "user": "The user to block"
+                }
+            },
+            "unblock": {
+                "description": "Unblocks a user.",
+                "parameters": {
+                    "user": "The user to unblock"
+                }
+            },
+            "allowwhispers": {
+                "description": "If set to False, no users will be able to send you whispers.",
+                "parameters": {
+                    "enable": "Must be 'True' or 'False'"
+                }
+            }
+        }
+    },
+    "fun": {
+        "title": "Fun",
+        "description": "Some fun other commands. (Note: Any 'say' commands or similar are passed trough a profanity filter).",
+        "color": 14881497,
+        "commands": {
+            "say": {
+                "description": "Luna will say whatever message you want.",
+                "parameters": {
+                    "message": "Message to send"
+                }
+            },
+            "sparkle": {
+                "description": "Surrounds your message in ✨sparkles✨.",
+                "parameters": {
+                    "message": "Message to sparkle"
+                }
+            },
+            "makequirky": {
+                "description": "Types out you message in aLtErNaTiNg CaPs (every other letter capitalized).",
+                "parameters": {
+                    "message": "Message to make quirky"
+                }
+            }
+        } 
+    }
+}
