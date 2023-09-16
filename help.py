@@ -1,35 +1,77 @@
 import discord
-from discord import app_commands
 
 import embeds
+from data import Data_File
 from luna import *
 
-help_interactions = discord.Embed(title="Default Interactions", description="Luna will respond to certain phrases that you send in any channel she's part of and had send_message permissions in.", color=embeds.red)
-help_interactions.add_field(name="/interactions default list", value="Lists all of the default interactions.", inline=False)
+class Help_Info :
+    def __init__(self, help_info : dict) -> None:
+        self.data = help_info
+    
+    def title(self) -> str :
+        return self.data["title"]
 
-help_custom_interactions = discord.Embed(title="Custom Interactions", description="Custom interactions work the same way as default interactions. Custom interactions can be bound by user or bound by server. Only server administrators can create server-wide custom interactions.", color=embeds.purple)
-help_custom_interactions.add_field(name="/interactions custom list", value="Lists custom interactions.\n**type:** Must be either 'user' or 'server' to list all user-bound or server-bound custom interactions")
-help_custom_interactions.add_field(name="/interactions custom add", value="Create a custom interaction.\n**type:** Must be either 'user' or 'server' to create user-bound or server-bound custom interactions\n**trigger:** The phrase Luna looks for. Upper-case and spaces will be ignored. Adding '\\contains\\ at the start of the trigger will make Luna respond to any message containing the phrase anywhere in it's content'\n**response:** The phrase Luna should respond with. Separate possible responses with a '|'.", inline=False)
-help_custom_interactions.add_field(name="/interactions custom delete", value="Delete a custom interaction.\n**type:** Must be either 'user' or 'server' to delete a user-bound or server-bound custom interaction\n**trigger:** The phrase associated with the interaction you're trying to delete. Upper-case and spaces will be ignored.", inline=False)
+    def description(self) -> str :
+        return self.data["description"]
+    
+    def color(self) -> int :
+        return self.data["color"]
+    
+    def commands(self) -> str :
+        return self.data["commands"]
+    
+    def embed(self) -> discord.Embed :
+        embed = discord.Embed(title=self.title(), description=self.description(), color=self.color())
+        commands = self.commands()
+        for command in commands :
+            command_description = commands[command]["description"]
+            parameters = commands[command]["parameters"]
+            for parameter in parameters :
+                command_description = f'{command_description}\n**{parameter}:** {parameters[parameter]}'
+            embed.add_field(name=f'`/{command}`', value=command_description, inline=False)
+        
+        return embed
 
 
-help_economy = discord.Embed(title="Economy", description="Luna Bot has an economy system. Earn coins by playing with Luna. The highest net-worth accounts will be displayed on the leaderboard.", color=embeds.green)
-help_economy.add_field(name="/daily", value="Feed Luna her daily portion of food to earn a reward.", inline=False)
-help_economy.add_field(name="/play", value="Play with Luna to receive rewards.", inline=False)
-help_economy.add_field(name="/balance", value="Display the contents of a user's wallet.", inline=False)
-help_economy.add_field(name="/leaderboard server", value="Displays the richest users on the server.", inline=False)
-help_economy.add_field(name="/leaderboard global", value="Displays the richest users on Discord.", inline=False)
 
-help_items = discord.Embed(title="Items", description="Luna Bot's item system consists of items that can be bought, used and sold. Items can grant rewards, experience and more.", color=embeds.cyan)
-help_items.add_field(name="/shop", value="Browse items to purchase with your coins. Use the reactions to navigate the menu.", inline=False)
-help_items.add_field(name="/inventory", value="Displays the contents of your inventory and the actions that can be taken for each item. Use the reactions to navigate the menu.", inline=False)
+class Help(Data_File) :
+    def help_info(self) -> dict :
+        help_info_dict = {}
+        for key in self.data() : help_info_dict[key] = Help_Info(self.data()[key]).embed()
+        return help_info_dict
 
-help_experience = discord.Embed(title="Charisma", description="Luna Bot has an XP system called Charisma. Earn Charisma by interacting with Luna, using items, or playing with Luna. Increasing your lever unlocks items an rewards.", color=embeds.amber)
-help_experience.add_field(name="/experience", value="Display your current level.", inline=False)
+async def all_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embeds=tuple(help_info.values()), ephemeral=True)
 
-async def commands_help(ctx : discord.interactions.Interaction) -> None :
-    await ctx.response.send_message(embeds=(help_interactions, help_custom_interactions, help_economy, help_items, help_experience), ephemeral=True)
 
+async def interactions_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["default_interactions"], ephemeral=True)
+
+async def custom_interactions_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["custom_interactions"], ephemeral=True)
+
+async def economy_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["economy"], ephemeral=True)
+
+async def items_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["items"], ephemeral=True)
+
+async def experience_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["experience"], ephemeral=True)
+
+async def whisper_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["whisper"], ephemeral=True)
+
+async def fun_commands(ctx : discord.interactions.Interaction) -> None :
+    help_info = Help("data/default/help.json").help_info()
+    await ctx.response.send_message(embed=help_info["fun"], ephemeral=True)
 
 @client.tree.command(name="help", description="Provides useful info for using Luna Bot")
 async def help(ctx : discord.interactions.Interaction) -> None :
@@ -37,8 +79,37 @@ async def help(ctx : discord.interactions.Interaction) -> None :
     embed.add_field(name="Discord Server", value="https://discord.gg/Jkbuz8SwBY")
 
     view = discord.ui.View()
-    commands_button = discord.ui.Button(label="Commands", style=discord.ButtonStyle.green)
-    commands_button.callback = commands_help
+
+    commands_button = discord.ui.Button(label="All Commands", style=discord.ButtonStyle.green, row=4)
+    commands_button.callback = all_commands
     view.add_item(commands_button)
+
+    interactions_button = discord.ui.Button(label="Interactions", style=discord.ButtonStyle.grey, emoji="📕")
+    interactions_button.callback = interactions_commands
+    view.add_item(interactions_button)
+
+    custom_interactions_button = discord.ui.Button(label="Custom Interactions", style=discord.ButtonStyle.grey, emoji="📗")
+    custom_interactions_button.callback = custom_interactions_commands
+    view.add_item(custom_interactions_button)
+
+    economy_button = discord.ui.Button(label="Economy", style=discord.ButtonStyle.grey, emoji="🪙")
+    economy_button.callback = economy_commands
+    view.add_item(economy_button)
+
+    items_button = discord.ui.Button(label="Items", style=discord.ButtonStyle.grey, emoji="🎁")
+    items_button.callback = items_commands
+    view.add_item(items_button)
+
+    experience_button = discord.ui.Button(label="Experience", style=discord.ButtonStyle.grey, emoji="💎")
+    experience_button.callback = experience_commands
+    view.add_item(experience_button)
+
+    whisper_button = discord.ui.Button(label="Whisper", style=discord.ButtonStyle.grey, emoji="💬")
+    whisper_button.callback = whisper_commands
+    view.add_item(whisper_button)
+
+    fun_button = discord.ui.Button(label="Fun", style=discord.ButtonStyle.grey, emoji="✨")
+    fun_button.callback = fun_commands
+    view.add_item(fun_button)
 
     await ctx.response.send_message(embed=embed, view=view, ephemeral=True)
