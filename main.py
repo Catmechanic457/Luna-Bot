@@ -188,8 +188,4 @@ async def unblock(ctx : discord.interactions.Interaction, enable : bool) -> None
     user_settings_file.edit_setting("accept_whisper", enable)
     await ctx.response.send_message(embed=discord.Embed(title=f'Accept Whispers : {enable}', description="", color=embeds.green if enable else embeds.red), ephemeral=True)
 
-@client.tree.command(name="error", description="Throws an error")
-async def error(ctx : discord.interactions.Interaction) -> None :
-    raise RuntimeError
-
 client.run(config.get_token())
