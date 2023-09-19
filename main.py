@@ -63,7 +63,13 @@ async def on_message(message : discord.Message) -> None :
 
     await client.process_commands(message) # Process commands after any messages
 
+@client.event
+async def on_guild_join(guild : discord.Guild) -> None :
+    print(f'Joined guild:\nid: {guild.id}\nname: {guild.name}')
 
+@client.event
+async def on_guild_leave(guild : discord.Guild) -> None :
+    print(f'Left guild:\nid: {guild.id}\nname: {guild.name}')
 
 # Slash Commands
 
@@ -181,5 +187,9 @@ async def unblock(ctx : discord.interactions.Interaction, enable : bool) -> None
     user_settings_file = User_Settings("data/data.json", ctx.user.id) 
     user_settings_file.edit_setting("accept_whisper", enable)
     await ctx.response.send_message(embed=discord.Embed(title=f'Accept Whispers : {enable}', description="", color=embeds.green if enable else embeds.red), ephemeral=True)
+
+@client.tree.command(name="error", description="Throws an error")
+async def error(ctx : discord.interactions.Interaction) -> None :
+    raise RuntimeError
 
 client.run(config.get_token())
