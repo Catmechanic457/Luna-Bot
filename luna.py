@@ -7,6 +7,7 @@ from random import choice
 import default_interactions
 import substitutions as default_substitutions
 from config import Config
+from log import Logs
 
 class LunaBot(commands.Bot) :
 
@@ -70,6 +71,7 @@ p_filter = ProfanityFilter(languages=['en'])
 interactions = default_interactions.Interactions("data/default/responses.json")
 substitutions = default_substitutions.Substitutions("data/default/substitutions.json")
 config = Config("data/default/config.json")
+console = Logs("logs/")
 
 intents = discord.Intents.all()
 intents.message_content = True

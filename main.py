@@ -15,12 +15,13 @@ import embeds
 @client.event
 async def on_ready() -> None :
     # When the bot logs on
-    print('Luna is ready')
+    console.log('Luna is ready')
     try :
-        print("Syncing Commands...")
+        console.log("Syncing Commands...")
         synced = await client.tree.sync()
-        print(f'Synced {len(synced)} command(s)')
+        console.log(f'Synced {len(synced)} command(s)')
     except Exception as e :
+        console.log("Error syncing commands")
         print(e)
         
     
@@ -42,14 +43,14 @@ async def on_message(message : discord.Message) -> None :
             cooldown.mark(60)
             experience_file = Experience("data/data.json", message.author.id)
             experience_file.edit(randint(5,45))
-        print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{intercept}\'')
+        console.log(f'Default interaction:\n\treceived: {message.content}\n\tfiltered to: {filtered_input}\n\treturning: {intercept}')
         await channel.send(intercept)
     
     # Unprompted messages
     if True :
         unprompted_message = client.unprompted_message()
         if not unprompted_message == None :
-            print(f'Sending Unprompted \'{unprompted_message}\'')
+            console.log(f'Unprompted:\n\tmessage: {unprompted_message}')
             await channel.send(unprompted_message)
     
     # Custom interactions
@@ -57,7 +58,7 @@ async def on_message(message : discord.Message) -> None :
         custom_interactions_file = Custom_Interactions_Group("data/data.json", client.get_guild_id(message), message.author.id)
         response = custom_interactions_file.get_response(filtered_input)
         if response :
-            print(f'Received \'{message.content}\'\tFiltered To \'{filtered_input}\'\tReturning \'{response}\'')
+            console.log(f'Custom interaction:\n\treceived: {message.content}\n\tfiltered to: {filtered_input}\n\treturning: {response}')
             await channel.send(response)
 
 
@@ -65,11 +66,11 @@ async def on_message(message : discord.Message) -> None :
 
 @client.event
 async def on_guild_join(guild : discord.Guild) -> None :
-    print(f'Joined guild:\nid: {guild.id}\nname: {guild.name}')
+    console.log(f'Joined guild:\n\tid: {guild.id}\n\tname: {guild.name}')
 
 @client.event
 async def on_guild_leave(guild : discord.Guild) -> None :
-    print(f'Left guild:\nid: {guild.id}\nname: {guild.name}')
+    console.log(f'Left guild:\n\tid: {guild.id}\n\tname: {guild.name}')
 
 # Slash Commands
 
@@ -159,6 +160,7 @@ async def whisper(ctx : discord.interactions.Interaction, user : discord.User, m
 
     await ctx.response.send_message(embed=discord.Embed(title="Sending message", description="Please wait...", color=embeds.amber), ephemeral=True)
     try :
+        console.log(f'Whisper:\n\tmessage: {message}\n\tsender: {sender_id}\n\trecipient: {user.id}')
         await user.send(embed=embed, view=view)
         await ctx.edit_original_response(embed=discord.Embed(title="Message sent", description=f'"{message}"', color=embeds.green))
         cooldown.mark(in_seconds(minutes=5,seconds=30))
