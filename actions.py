@@ -70,7 +70,7 @@ async def play(ctx : discord.interactions.Interaction) -> None :
         negative_chance = 5
         type = "positive" if randint(1,negative_chance) != 1 else "negative"
         action = Action("data/default/actions.json", choice(daily_food_actions), type)
-        await enact(ctx, "Play with Luna", action)
+        await enact(ctx, "Feed Luna", action)
         return
 
     else :
