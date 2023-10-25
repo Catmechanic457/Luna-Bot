@@ -32,6 +32,7 @@ treats_jar = ":jar:"
 
 yarn = ":yarn:"
 mouse = ":mouse2:"
+catnip = ":herb:"
 
 laser_pointer = ":pen_ballpoint:"
 

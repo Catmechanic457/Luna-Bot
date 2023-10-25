@@ -293,10 +293,16 @@ def items() -> dict[str, Item] :
             embed = discord.Embed(title=f'{ctx.user.name} points a laser near Luna', description="She chases it", color=embeds.amber)
             await ctx.response.send_message(embeds=(embed, experience.edit_charisma(ctx, randint(30,80))))
             return True
-                
+
+        async def catnip(self : Item, ctx : discord.interactions.Interaction) -> bool :
+            embed = discord.Embed(title=f'{ctx.user.name} gives Luna some catnip', description="She digs in and goes crazy", color=embeds.amber)
+            await ctx.response.send_message(embeds=(embed, experience.edit_charisma(ctx, randint(40,90))))
+            return True
+
         items = [
             Item("Basic Fishing Rod", luna_assets.fishing_rod, "basic_fishing_rod", description="Used to catch fish. Cannot catch large fish", purchasable=True, cost=200, sell_value=75, usable=True, uses=3, cooldown_seconds=300, on_use_func=basic_fish),
             Item("Advanced Fishing Rod", luna_assets.advanced_fishing_rod, "advanced_fishing_rod", description="Used to catch fish. Can catch larger fish", purchasable=True, required_level=6, cost=500, sell_value=250, usable=True, uses=10, cooldown_seconds=240, on_use_func=advanced_fish),
+            
             Item("Fish", luna_assets.fish, "fish", description="A fish to feed to Luna", usable=True, sell_value=15, uses=1, on_use_func=feed_luna_fish),
             Item("Shrimp", luna_assets.shrimp, "shrimp", description="A small shrimp", sell_value=60),
             Item("Tropical Fish", luna_assets.tropical_fish, "tropical_fish", description="A rare tropical fish", sell_value=100),
@@ -305,12 +311,14 @@ def items() -> dict[str, Item] :
             Item("Squid", luna_assets.squid, "squid", description="A small squid", sell_value=350),
             Item("Lobster", luna_assets.lobster, "lobster", description="A large lobster", sell_value=500),
             Item("Octopus", luna_assets.octopus, "octopus", description="A large octopus", sell_value=650),
+            
             Item("Cardboard Scratch Box", luna_assets.cardboard_box, "scratch_box", description="Some cardboard for Luna to scratch", purchasable=True, cost=150, sell_value=60, usable=True, uses=2, cooldown_seconds=180, on_use_func=scratch),
             Item("Scratch Post", luna_assets.wooden_frame, "scratch_post", description="A wooden post for Luna to scratch", purchasable=True, required_level=3, cost=250, sell_value=100, usable=True, uses=8, cooldown_seconds=120, on_use_func=scratch),
             Item("Treats", luna_assets.treats_can, "treats_can", description="A small tin of treats to feed Luna", purchasable=True, required_level=4, cost=300, sell_value=120, usable=True, uses=5, cooldown_seconds=600, on_use_func=treats),
             Item("Jar of Treats", luna_assets.treats_jar, "treats_jar", description="A jar of treats to feed Luna", purchasable=True, required_level=7, cost=550, sell_value=225, usable=True, uses=15,cooldown_seconds=600, on_use_func=treats),
             Item("Yarn", luna_assets.yarn, "yarn", description="A ball of yarn", purchasable=True, cost=75, sell_value=25, usable=True, uses=1, on_use_func=yarn),
             Item("Toy Mouse", luna_assets.mouse, "mouse", description="A toy mouse made from yarn", purchasable=True, required_level=2, cost=150, sell_value=80, usable=True, uses=4, cooldown_seconds=120, on_use_func=mouse),
+            Item("Catnip", luna_assets.catnip, "catnip", description="Some catnip Luna goes crazy for", purchasable=True, required_level=9, cost=250, sell_value=125, usable=True, uses=5, cooldown_seconds=120, on_use_func=catnip),
             Item("Laser Pointer", luna_assets.laser_pointer, "laser_pointer", description="A laser pointer Luna loves to chase", purchasable=True, required_level=8, cost=750, sell_value=400, usable=True, uses=15, cooldown_seconds=120, on_use_func=laser)
         ]
 
