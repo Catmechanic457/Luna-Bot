@@ -11,11 +11,6 @@ from log import Logs
 
 class LunaBot(commands.Bot) :
 
-    last_wished_date = None
-    daily_food_timestamp = {}
-    play_timestamp = {}
-    whisper_timestamp = {}
-
     def intercept(self, message : str) -> str | None :
         response = interactions.get_response(message)
         if response : return str(response)
@@ -56,13 +51,13 @@ class LunaBot(commands.Bot) :
         except :
             return None
     
-    def check_permission(self, ctx : discord.interactions.Interaction) -> bool :
+    def check_permission(self, user : discord.Member) -> bool :
         # Untested
         config_file = Config("data/default/config.json")
         whitelist = config_file.whitelist()
-        if ctx.user.name in whitelist :
+        if user.name in whitelist :
             return True
-        if ctx.user.guild_permissions.administrator : return True
+        if user.guild_permissions.administrator : return True
         return False
 
 from profanity_filter import ProfanityFilter
