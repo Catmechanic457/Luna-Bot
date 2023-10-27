@@ -62,7 +62,7 @@ async def play(ctx : discord.interactions.Interaction) -> None :
         await ctx.response.send_message(embed=embed, ephemeral=True)
         return
 
-@client.tree.command(name="daily", description="Give Luna her daily bowl of food receive rewards")
+@client.tree.command(name="daily", description="Give Luna her daily bowl of food to receive rewards")
 async def play(ctx : discord.interactions.Interaction) -> None :
     cooldown = Cooldown("data/cooldown.json", ctx.user.id, "daily_command")
     if cooldown.able() :
