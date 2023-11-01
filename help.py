@@ -75,7 +75,7 @@ async def fun_commands(ctx : discord.interactions.Interaction) -> None :
 
 @client.tree.command(name="help", description="Provides useful info for using Luna Bot")
 async def help(ctx : discord.interactions.Interaction) -> None :
-    embed = discord.Embed(title="Luna Bot",description="Luna Bot is designed to be a fun addition to any text channel, reacting to certain phrases is a cute way.\nLuna also has an economy, charisma and item system. Earn coins by playing with Luna, and use those coins to purchase items in the shop. Interacting with Luna will increase your charisma, allowing you to unlock new items.\n\nLuna bot was created as a passion project during school holidays and named after my girlfriend's cat.", color=embeds.green)
+    embed = discord.Embed(title="Luna Bot",description="Luna Bot is designed to be a fun addition to any text channel, reacting to certain phrases is a cute way.\nLuna also has an economy, charisma and item system. Earn coins by playing with Luna, and use those coins to purchase items in the shop. Interacting with Luna will increase your charisma, allowing you to unlock new items.\n\nLuna bot was created as a passion project during school holidays.", color=embeds.green)
     embed.add_field(name="Discord Server", value="https://discord.gg/Jkbuz8SwBY")
 
     view = discord.ui.View()
